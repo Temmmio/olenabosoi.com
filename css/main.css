@@ -170,9 +170,6 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* The face sits above the middle: kept in view when the card is wide and
-     short (phones). */
-  object-position: 50% 35%;
   border-radius: inherit;
 }
 /* The shade: clear at the top, darker towards the text at the bottom. */
@@ -209,7 +206,7 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
 }
 
 /* Phones: the card shows too (Osmo hides the visual column there), under
-   the links, full width and only as tall as its content. */
+   the links, full width and square, as on larger screens. */
 @media screen and (max-width: 767px) {
   .twostep-nav__bottom-row {
     flex-direction: column;
@@ -224,7 +221,6 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
     width: 100%;
     min-height: 0;
   }
-  .twostep-nav__visual.nav-card { aspect-ratio: auto; }
 }
 
 /* ============================================
