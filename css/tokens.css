@@ -64,12 +64,13 @@
   --hero-eyebrow: color-mix(in srgb, var(--fg) 60%, transparent);
   /* Eyebrows (section labels). */
   --text-eyebrow: var(--text-3);
-  /* The call-to-action card in the open menu, and its button: the card in
-     the accent, the button the other way round. */
-  --nav-card-bg: var(--accent);
-  --nav-card-text: var(--accent-text);
-  --nav-card-button: var(--accent-text);
-  --nav-card-button-text: var(--accent);
+  /* The call-to-action card in the open menu: a photo darkened towards the
+     bottom, light text on it, and the button in the accent. The plate shows
+     only until the photo loads. */
+  --nav-card-bg: var(--surface-2);
+  --nav-card-text: #ffffff;
+  --nav-card-button: var(--accent);
+  --nav-card-button-text: var(--accent-text);
 
   /* Blurred surface for things that sit over moving content (the menu bar,
      the disc under the Work ring): a 30% grey at 50%, over a 30px blur.
