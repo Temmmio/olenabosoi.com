@@ -1,0 +1,1339 @@
+/* ============================================
+   olenabosoi.com — Base, utilities, components
+   Class names follow the Osmo convention (block__element, is--modifier)
+   so they can be rebuilt one-to-one as Webflow classes and combo classes.
+   ============================================ */
+
+/* ---- Base ---- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { background-color: var(--bg); }
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img { max-width: 100%; display: block; }
+p, h1, h2, h3, h4, h5, h6 { margin: 0; }
+a { color: inherit; }
+sup { font-size: 0.5em; line-height: 0; vertical-align: super; }
+
+/* ---- Typography ---- */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  text-wrap: balance;
+}
+h1, .h1 { font-size: var(--fs-h1); line-height: var(--lh-tight); letter-spacing: -0.045em; }
+h2, .h2 { font-size: var(--fs-h2); line-height: var(--lh-tight); letter-spacing: -0.04em; }
+h3, .h3 { font-size: var(--fs-h3); line-height: 1.07; letter-spacing: -0.035em; }
+h4, .h4 { font-size: var(--fs-h4); line-height: 1.15; letter-spacing: -0.03em; }
+h5, .h5 { font-size: var(--fs-h5); line-height: 1.25; letter-spacing: -0.025em; }
+h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
+
+/* Eyebrow: the small label above a section's heading, in its own face. */
+.eyebrow {
+  font-family: var(--font-eyebrow);
+  font-size: var(--fs-eyebrow);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.1;
+}
+.eyebrow.is--subtle { color: var(--text-eyebrow); }
+/* Over the hero photo the eyebrows are see-through rather than a solid
+   grey, so the picture shows through them like the name below. */
+.hero .eyebrow.is--subtle { color: var(--hero-eyebrow); }
+
+.body-lg { font-size: var(--fs-body-lg); }
+.body-sm { font-size: var(--fs-body-sm); }
+.is--muted { color: var(--text-2); }
+.is--subtle { color: var(--text-3); }
+
+/* ---- Layout ---- */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+.container.is--full { max-width: none; }
+
+/* ============================================
+   Buttons — Osmo Button 038, set to the site palette
+   Filled button: <a data-button-038 class="button-038"> with __bg, __inner and
+   [data-button-038-text]; data-button-038-width-hover / -height-hover set how
+   far the background grows on hover.
+   Text-only variant for links: .button-038.is--link inside a [data-hover] link,
+   so hovering or focusing the whole link rolls the letters.
+   ============================================ */
+:root {
+  /* Larger than Osmo's 0.75em 1em: about 52px tall at body size. */
+  --button-038-padding: 1.125em 1.75em;
+  --button-038-color: var(--accent-text);
+  --button-038-color-background: var(--accent);
+  --button-038-color-focus: var(--fg);
+}
+
+.button-038 { font-weight: 500; }
+
+/* Outlined variant: no fill, a 1px ring that grows with the background on hover. */
+.button-038.is--secondary {
+  --button-038-color: var(--fg);
+  --button-038-color-background: transparent;
+}
+.button-038.is--secondary .button-038__bg { box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+.button-038.is--link {
+  --button-038-padding: 0;
+  --button-038-color: currentColor;
+  --button-038-color-background: transparent;
+  font-weight: inherit;
+}
+
+/* Underline Link Animation on these links: Osmo sets the line under a box with
+   line-height 1.25, the roll text has 1, so the line sat on the letters. Lower
+   it by the same 0.125em that line-height 1.25 adds below the text. */
+.button-038.is--link[data-underline-link]::before { bottom: -0.1875em; }
+
+/* ============================================
+   Navigation — site styling on top of the Osmo component
+   ============================================ */
+.twostep-nav__bar { color: var(--text-1); }
+
+/* The bar: blurred surface over the page. */
+.twostep-nav__back-bg {
+  background-color: var(--surface-blur);
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+  border-radius: var(--radius-lg);
+}
+
+.twostep-nav__logo { width: auto; text-decoration: none; }
+.twostep-nav__logo-text {
+  font-size: 1.125em;
+  font-weight: 500; /* the menu links' weight */
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.twostep-nav__toggle { border: 0; color: inherit; }
+.twostep-nav__toggle-bar { background-color: currentColor; }
+.twostep-nav__top-line { display: none; } /* no divider under the bar when open */
+
+.twostep-nav__link-span,
+.twostep-nav__link-eyebrow { font-family: var(--font-sans); }
+
+/* The menu links are Heading 5 sized, with its line height and tracking. */
+.twostep-nav__link-span {
+  font-size: var(--fs-h5);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.twostep-nav__link-eyebrow {
+  opacity: 1;
+  color: var(--text-2);
+}
+
+.twostep-nav__visual { border-radius: var(--radius-sm); }
+
+/* Card in the open menu: one link to book a call. The plate in the accent,
+   the title in the accent text, and the button the other way round (a div,
+   since the whole card is the link) in the bottom-left corner. [data-hover] on the card plays the
+   button's hover when anywhere on the card is hovered. */
+.nav-card {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  border-radius: var(--radius-md);
+  background-color: var(--nav-card-bg);
+  color: var(--nav-card-text);
+  text-decoration: none;
+}
+.nav-card .button-038 {
+  --button-038-color: var(--nav-card-button-text);
+  --button-038-color-background: var(--nav-card-button);
+}
+
+.nav-card__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+/* The same type as the menu links (.twostep-nav__link-span). */
+.nav-card__title {
+  font-size: var(--fs-h5);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+/* Phones: the card shows too (Osmo hides the visual column there), under
+   the links, full width and only as tall as its content. */
+@media screen and (max-width: 767px) {
+  .twostep-nav__bottom-row {
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+  .twostep-nav__bottom-col.is--visual {
+    display: flex;
+    flex: none;
+    width: 100%;
+    min-height: 0;
+  }
+  .twostep-nav__visual.nav-card { aspect-ratio: auto; }
+}
+
+/* ============================================
+   Hero
+   ============================================ */
+/* One screen tall; everything visible sits in .hero__card. */
+.hero {
+  position: relative;
+  height: 100svh;
+  min-height: 36rem;
+}
+
+.hero__card {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  isolation: isolate;
+}
+
+.hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Own GPU layer: the photo grows on scroll (js/main.js). */
+.hero__img { will-change: transform; }
+
+/* The hero photo's tint (--hero-tint), blended by --hero-tint-blend
+   ("color" by default: the photo takes its hue while keeping its own light
+   and shade). */
+.hero__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--hero-tint);
+  mix-blend-mode: var(--hero-tint-blend);
+  pointer-events: none;
+}
+
+/* --hero-focus: where the face is in the photo (set on the img), kept in
+   the middle of the screen however the photo is cropped. */
+.hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--hero-focus, 50% 50%);
+}
+
+.hero__container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.hero__grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--grid-gap);
+  align-items: center;
+  padding-top: var(--space-24); /* clear the fixed navigation bar */
+}
+
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+/* The hero's lines keep the earlier Heading 2 size (32 -> 52), smaller than
+   the section headings: three lines each beside the portrait. */
+.hero__content .h2 { font-size: clamp(2rem, 1.398rem + 2.469vw, 3.25rem); }
+
+/* Both blocks sit on the vertical centre line: the left one ends on it,
+   the right one starts on it. The intro animates the gap open from 0.
+   transform, not the translate property: GSAP folds translate into its own
+   transform and drops it, so the offset would be lost when props are cleared. */
+.hero__content.is--start {
+  align-items: flex-end;
+  text-align: right;
+  transform: translateY(-50%);
+}
+
+.hero__content.is--end {
+  align-items: flex-start;
+  transform: translateY(50%);
+}
+
+/* The card's overflow: clip is the mask for the letter reveal:
+   the name sits on the bottom edge, so letters rise from below it. */
+/* Letters grow more opaque as they get bolder: 18% at the lightest weight,
+   fully opaque from ~82% of the weight range up. --wght is set per letter by Variable Font Weight Hover;
+   until the pointer first moves it is unset and the letters stay at 18%. */
+.hero__name .char,
+.footer__name .char {
+  /* Weight from --wght as soon as js/main.js sets it (the shimmer after the
+     rise), not only once the weight hover activates; the lightest until then. */
+  font-variation-settings: "wght" var(--wght, var(--wght-min));
+  --wght-t: clamp(0, (var(--wght, var(--wght-min)) - var(--wght-min)) / (var(--wght-max) - var(--wght-min)), 1);
+  /* Its hue moves from the text colour at rest to the accent at the
+     shimmer's (and hover's) peak. */
+  color: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--accent) calc(var(--wght-t) * 100%), var(--fg)) min(100%, calc(18% + var(--wght-t) * 100%)),
+    transparent
+  );
+}
+
+/* Phones: the hero name is fully white from the start, at any weight, so it
+   reads clearly on the photo; the shimmer then only swells the letters. */
+@media screen and (max-width: 767px) {
+  /* .hero in front: above the muted colour set further down. */
+  .hero .hero__name,
+  .hero .hero__name .char { color: var(--fg); }
+}
+
+/* Flex, not block: a block would give the inline-block name a line box with
+   room for descenders under it, leaving a gap at the bottom. Centred, so when
+   the letters get lighter (and narrower) the name shrinks evenly to both sides. */
+.hero__name-wrap { display: flex; justify-content: center; }
+
+
+.hero__name,
+.footer__name {
+  /* Muted, so the name sits back on the photo: a faint fill with a hairline edge. */
+  color: color-mix(in srgb, var(--fg) 18%, transparent);
+  /* Weight range of Variable Font Weight Hover (data-min / data-max on the h1). */
+  --wght-min: 200;
+  --wght-max: 600;
+  /* At rest the name is at its lightest (and so its faintest): that's the
+     weight it rises with, is fitted to the width at, and settles back to. */
+  font-weight: 200;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  text-wrap: nowrap;
+  /* Trim the line box to the letters: cap height on top, baseline at the bottom,
+     so the name sits flush on the section's bottom edge. */
+  text-box: trim-both cap alphabetic;
+  /* SplitText breaks kerning pairs into separate boxes; keep kerning off at all
+     times so the letters don't shift when the split is reverted. */
+  font-kerning: none;
+  font-variant-ligatures: none;
+}
+
+@media screen and (max-width: 767px) {
+  .hero__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-6);
+    align-items: end;
+    padding-bottom: var(--space-12); /* room above the name (was --space-6) */
+  }
+  .hero__col.is--center { display: none; }
+
+  /* No spread on phones: both blocks sit side by side right above the name. */
+  .hero__content.is--start,
+  .hero__content.is--end { transform: none; }
+}
+
+/* ============================================
+   Intro — an eyebrow and a large centred paragraph (Osmo Gradient Wave Text on Scroll)
+   ============================================ */
+/* The same air above as below. */
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: var(--space-air);
+}
+
+.intro__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+}
+
+/* The script fades each letter to this colour, so it stays on the token. */
+.intro__text {
+  max-width: 22em;
+  color: var(--text-1);
+  text-wrap: pretty;
+}
+
+/* ============================================
+   Services — Osmo Stacking Sticky Cards (Bounce), set to the site palette
+   ============================================ */
+/* The intro above already leaves its air below; Osmo's own 15dvh on top
+   of it made this gap the largest on the page. */
+.services.cards-stack { padding-top: 0; }
+
+.services__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-section);
+  text-align: center;
+}
+.services__head .h2 { max-width: 13em; } /* as .section-head */
+
+/* Type comes from the site scale (h1 number, h4 title, body-size list, set as
+   classes in the markup); the list drops Osmo's own size, weight and tracking
+   and takes the regular body text. */
+/* No fixed height for the list (Osmo: min-height 11em); the title keeps its
+   distance with a margin instead. */
+.cards-stack-card__services { min-height: 0; }
+.cards-stack-card__h { margin-bottom: var(--space-6); }
+
+.cards-stack-card__services-p {
+  font-size: var(--fs-body);
+  font-weight: inherit;
+  line-height: var(--lh-base);
+  letter-spacing: inherit;
+}
+
+/* Three solid plates, one step of grey apart: the first card is the lightest. */
+.cards-stack-card {
+  aspect-ratio: 4 / 5; /* Osmo: 2 / 3 */
+  color: var(--text-1);
+  border-radius: var(--radius-lg);
+}
+.cards-stack-card__number { color: var(--accent); }
+.cards-stack-card__services-p { color: var(--text-3); }
+
+/* Services list: a check in the accent before each item, held to the first line. */
+.cards-stack-card__services-p {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.cards-stack-card__services-p::before {
+  content: "";
+  flex: none;
+  width: 1em;
+  height: calc(1em * var(--lh-base));
+  background-color: var(--accent-ui);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5l3.25 3.25L13 5'/%3E%3C/svg%3E") center / 1em no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5l3.25 3.25L13 5'/%3E%3C/svg%3E") center / 1em no-repeat;
+}
+
+/* Lock the cards below the fixed navigation bar. */
+.cards-stack__item { top: var(--space-32); }
+
+/* ============================================
+   Work — a head, then one pinned block for the three niches. Layout and motion
+   follow the "other amazing entries" block on codetv-gsap-cloud.webflow.io.
+   Base styles are the fallback (narrow screens, reduced motion): a swipeable
+   CSS carousel. The scroll version is further down.
+   ============================================ */
+.work { padding-top: var(--space-air); }
+
+.work__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-section);
+  text-align: center;
+}
+
+/* 12em: three lines. Each half of the title is ~12.7em at weight 500, so two
+   lines never fit; text-wrap: balance then evens the three out. */
+.work__head .h2 { max-width: 12em; }
+
+.work-runner { padding-bottom: var(--space-section); }
+
+.work-runner__label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+  padding-inline: var(--container-pad);
+}
+
+/* Niche title: one heading. The banner count sits on its own line above the
+   name; the highlight runs on the name only. */
+.work-runner__count { display: block; }
+/* 8em: "creatives" drops to its own line ("Cybersecurity" is 6.3em,
+   "B2B SaaS creatives" 8.9em), while "AI product ads" (6.5em) stays on one. */
+.work-runner__title { max-width: 8em; }
+
+/* Progress through the niche: a ring around the title that closes while the
+   niche is pinned. Placed absolutely, centred on the title (with margins, so
+   the transforms stay free for the animation), and takes no room.
+   The wrapper bounces when the pin starts; the ring inside grows on the way in.
+   Scroll version only. */
+/* Perspective for the ring's tilt on the way in. */
+.work-runner__label { position: relative; perspective: 1000px; }
+.work-runner__ring {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* 320px. The SVG inside is drawn at the same size (viewBox 0 0 320 320,
+     radius 159.5 = half minus half the line), so the line is exactly 1px.
+     To resize the ring, change both together. */
+  width: 20rem;
+  height: 20rem;
+  margin: -10rem 0 0 -10rem;
+}
+/* The ring sits under the title text (z-index -1 inside the label). */
+.work-runner__ring { z-index: -1; }
+/* The ring line and its ripples: the text colour, flashing to the accent when
+   the ring bounces (--ring-flash, set from js/main.js), as the elastic lines. */
+.work-runner__ring {
+  --ring-line: color-mix(in srgb, var(--accent-ui) var(--ring-flash, 0%), currentColor);
+}
+
+/* Disc inside the ring, the same blurred surface as the menu bar: blurs the
+   banners passing under it. Centred on the ring and sized with it, so it can
+   grow past the ring's box while the ring closes in. */
+.work-runner__disc {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+/* The fill sits 1rem inside the ring line, all the way in. Its corners round
+   from a square into a circle on the way in (--disc-radius, set from js/main.js),
+   and it starts lighter, mixed with the text colour (--disc-light), and dims to
+   the menu bar's surface as it rounds. */
+.work-runner__disc::before {
+  content: "";
+  position: absolute;
+  inset: 1rem;
+  border-radius: var(--disc-radius, 50%);
+  background-color: color-mix(in srgb, var(--accent-ui) var(--disc-light, 0%), var(--surface-blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+}
+
+/* Ripples: copies of the ring line that spread out and fade when the ring
+   fills up (js/main.js). The ring line runs along the box's edge. */
+.work-runner__ripple {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--ring-line);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.work-runner__progress {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke-width: 1;
+}
+.work-runner__progress-fill {
+  stroke: var(--ring-line);
+  /* Gap twice the line: with a gap of 1 the next dash starts exactly at the
+     path's end and anti-aliasing leaves a dot there while the ring is empty. */
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 1;
+}
+
+/* Fallback: a plain CSS carousel, swiped sideways, snapping card by card. */
+.work-runner__cards {
+  display: flex;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0 var(--container-pad);
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--container-pad);
+  scrollbar-width: none;
+}
+.work-runner__cards::-webkit-scrollbar { display: none; }
+
+.work-card {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+/* Carousel width (both the niches and "And more"): 1.75 banners per screen,
+   so the next one always peeks in from the right. */
+@media (max-width: 880px) {
+  :root { --work-card-width: calc((100vw - var(--container-pad) - var(--space-4)) / 1.75); }
+  .work-runner__cards { align-items: flex-start; }
+  .work-runner .work-card__img {
+    width: var(--work-card-width);
+    height: auto;
+  }
+}
+
+/* Banner: just the image, rounded. */
+.work-card__img {
+  display: block;
+  width: auto;
+  height: var(--work-card-height);
+  border-radius: var(--radius-md);
+}
+
+/* Scroll version: the block is pinned while the rows of cards slide past the
+   title in the centre of the screen, one niche after another. */
+@media (min-width: 881px) and (prefers-reduced-motion: no-preference) {
+  .work-runner {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+  }
+  .work-runner__viewport {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 100svh;
+  }
+  .work-runner__label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    align-items: center;
+    width: min(40rem, 90vw);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .work-runner__ring { display: block; }
+  .work-runner__cards {
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 1.4vw, 24px);
+    width: max-content;
+    padding: 0 105vw;
+    overflow: visible;
+    scroll-snap-type: none;
+    will-change: transform;
+  }
+  .work-runner { --work-card-height: clamp(10rem, 20svh, 18rem); }
+}
+
+/* The three niches in one block: the batches, the title swap, the dots and
+   the percentage (initWorkRunners). */
+/* Fallback (narrow screens, reduced motion): each batch is its own carousel
+   with its title above. */
+.work-runner.is--combined .work-runner__label { display: none; }
+/* The batches carry the space below each carousel, so the block adds none. */
+.work-runner.is--combined { padding-bottom: 0; }
+.work-combined__batch { padding-bottom: var(--space-section); }
+.work-combined__title-mask {
+  margin-bottom: var(--space-8);
+  padding-inline: var(--container-pad);
+}
+
+/* Scroll version: the batches lie on top of each other across the pinned
+   screen; only the cards take the pointer, so every batch's cards stay
+   clickable (Click to Zoom). */
+@media (min-width: 881px) and (prefers-reduced-motion: no-preference) {
+  .work-runner.is--combined .work-runner__label { display: flex; }
+
+  .work-combined__batch {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    pointer-events: none;
+  }
+  .work-combined__batch .work-card { pointer-events: auto; }
+
+  /* The niche title, centred in the ring, above the disc. It rises in and
+     out through its own mask when the batch changes (initWorkRunners). */
+  .work-combined__title-mask {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    width: min(40rem, 90vw);
+    margin: 0;
+    padding: 0;
+    overflow: clip;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .work-combined__title-mask .work-runner__title { margin-inline: auto; }
+
+  /* The row runs across the middle of the screen. */
+  .work-combined__track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    translate: 0 -50%;
+  }
+
+  /* Above the title, inside the ring: three dots for the three batches,
+     like slider dots; the current one stretches into a light pill. */
+  .work-combined__dots {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    gap: 0.375rem;
+    transform: translate(-50%, -6.5rem);
+  }
+  .work-combined__dot {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 0.1875rem;
+    background-color: color-mix(in srgb, var(--fg) 25%, transparent);
+    transition:
+      width var(--duration-fast) ease,
+      background-color var(--duration-fast) ease;
+  }
+  .work-combined__dot.is--active {
+    width: 1.25rem;
+    background-color: var(--fg);
+  }
+
+  /* Under the title, inside the ring: how much of the ring is filled. */
+  .work-combined__percent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    transform: translate(-50%, 6.25rem);
+    font-size: var(--fs-body-sm);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+}
+
+/* ============================================
+   Work — last block ("And more"): ten banners fly into a grid of five per
+   row (two on phones) on scroll, then gather into a pile. See initWorkMore.
+   ============================================ */
+.work-more {
+  padding: var(--space-section) var(--container-pad) var(--space-air);
+}
+
+/* Longer title than the niches above: three lines rather than six. */
+.work-more__title { max-width: 22em; }
+
+.work-more__label {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-section);
+  text-align: center;
+}
+
+/* Five columns of two banners, centred on each other, with the same gap
+   everywhere whatever the banners' proportions. */
+.work-more__grid {
+  --cols: 5;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+.work-more__col {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* Square banners, and 4:5 for .is--portrait; placeholders are cropped to fit. */
+.work-more__grid .work-card__img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+.work-more__grid .work-card.is--portrait .work-card__img { aspect-ratio: 4 / 5; }
+
+/* The pile, only ever set for a moment so initWorkMore can measure it: every card
+   at the grid's top centre, at its grid width (the tilt and shift come from JS). */
+.work-more__grid.is--pile .work-card {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: calc((100% - (var(--cols) - 1) * var(--space-4)) / var(--cols));
+}
+
+/* Phones: the niche titles run on one line, count included (wrapping only
+   if they must), and the "And more" title sits on the left like them. */
+@media (max-width: 767px) {
+  .work-runner__count { display: inline; }
+  .work-runner__title { max-width: none; }
+  .work-more__label {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+/* Narrow screens: no pile (see initWorkMore). The columns dissolve into one
+   swiped row, like the niches above, out to the screen edges. */
+@media (max-width: 880px) {
+  .work-more__grid {
+    justify-content: flex-start;
+    align-items: flex-start;
+    max-width: none;
+    margin-inline: calc(-1 * var(--container-pad));
+    padding-inline: var(--container-pad);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--container-pad);
+    scrollbar-width: none;
+  }
+  .work-more__grid::-webkit-scrollbar { display: none; }
+  .work-more__col { display: contents; }
+  .work-more__grid .work-card { width: var(--work-card-width); }
+}
+
+/* ============================================
+   About — a card across the container: photo left, text right
+   ============================================ */
+/* Above the Work block before it: the "And more" pile sinks behind the card
+   (initWorkMore). */
+.about {
+  position: relative;
+  z-index: 1;
+  padding-top: var(--space-section);
+}
+
+/* Plate with a small inset around the photo. */
+.about__card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  /* 10%: as light as the menu bar over black (24% grey at 40%). */
+  background-color: var(--surface-2);
+}
+
+/* The photo always fills its column's full height: 4:5 is only the minimum
+   (the ::before spacer), and when the text runs taller the photo grows with it. */
+.about__media {
+  position: relative;
+  overflow: hidden;
+  border-radius: calc(var(--radius-lg) - var(--space-3));
+}
+.about__media::before {
+  content: "";
+  display: block;
+  padding-top: 125%;
+}
+.about__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--space-10);
+  padding: var(--space-card);
+}
+
+.about__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: auto;
+}
+.about__head .h3 { max-width: 13em; }
+
+.about__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 30em;
+}
+
+.about__signature { width: 9.75rem; height: auto; }
+
+@media (max-width: 767px) {
+  .about__card { grid-template-columns: 1fr; }
+}
+
+/* ============================================
+   Numbers — the figures and labels rise into view through a mask
+   (Osmo Masked Text Reveal). Twice the section space on top, as much as
+   between the numbers and Clients below, so it reads as its own section.
+   ============================================ */
+.stats { padding-block: calc(var(--space-section) * 2) var(--space-section); }
+
+.stats__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-8) var(--grid-gap);
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
+.stats__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.stats__label { max-width: 12em; }
+
+@media (max-width: 767px) {
+  .stats__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Section head used by Clients and Why me: eyebrow and heading, centred. */
+.section-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-section);
+  text-align: center;
+}
+.section-head .h2 { max-width: 13em; }
+
+/* ============================================
+   Clients — Osmo Wavy Marquee of logos, full width
+   ============================================ */
+/* overflow: clip holds the marquee's long list and its wave inside the page. */
+.clients {
+  padding-block: var(--space-section);
+  overflow: clip;
+}
+
+/* Square logo plates in the site palette (Osmo's are round and light grey). */
+.logo-card {
+  background-color: var(--surface-2);
+  border-radius: var(--radius-md);
+}
+.logo-card__placeholder {
+  font-size: var(--fs-body-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  white-space: nowrap;
+  transition: color var(--duration-base) ease;
+}
+
+/* Client logo: the SVG (mask-image, set on the element, so its path is the
+   page's) as a mask over the text colour, centred: at most 1.5rem high and
+   the box's full width (65% of the plate, Osmo), keeping its proportions. */
+.logo-card__logo {
+  width: 100%;
+  height: 1.5rem;
+  background-color: var(--text-3);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  transition: background-color var(--duration-base) ease;
+}
+
+/* Hover: the plate and its logo light up (and bounce, js/main.js initLogoPulse). */
+.logo-card { transition: background-color var(--duration-base) ease; }
+@media (hover: hover) {
+  .logo-card:hover { background-color: var(--surface-3); }
+  .logo-card:hover .logo-card__placeholder { color: var(--text-1); }
+  .logo-card:hover .logo-card__logo { background-color: var(--text-1); }
+}
+
+/* ============================================
+   Process — five steps as upright cards that stack on
+   scroll and fan out (Osmo Stacking Sticky Cards (Bounce), as in Services):
+   number on top, title and description at the bottom
+   ============================================ */
+/* The stack's gap, card width (25em) and sticky top come from the Osmo and
+   Services rules. */
+
+/* Solid plates, one step lighter per card: the first is the darkest, so each
+   card that lands on the stack reads a little brighter than the one under it. */
+.process-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-8);
+  aspect-ratio: 4 / 5;
+  padding: var(--space-10);
+  border-radius: var(--radius-lg);
+  color: var(--text-1);
+}
+
+/* Services and Process cards: two quiet tones, alternating (1st, 3rd, 5th /
+   2nd, 4th), and a light edge mixed from the card's own text colour. */
+.cards-stack-card,
+.process-card {
+  background-color: var(--card-1);
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+.cards-stack__item:nth-child(even) > .cards-stack-card,
+.cards-stack__item:nth-child(even) > .process-card { background-color: var(--card-2); }
+
+.process-card__number { color: var(--accent); }
+
+/* Top row of the Services and Process cards: the number on the left, a
+   thinking orb (js/orbs.js) on the right, in the accent colour. */
+.cards-stack-card__start,
+.process-card__start {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.card-orb {
+  flex: none;
+  width: 8rem;
+  height: 8rem;
+  color: var(--accent-ui);
+}
+.process-card__end {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.process-card__text { color: var(--text-3); }
+
+@media (max-width: 767px) {
+  .process-card { padding: var(--space-6); }
+}
+
+/* Phones (Services and Process): the cards take about 80% of the screen
+   instead of the full width, so the bounce and the stack read better. */
+@media (max-width: 767px) {
+  .cards-stack__item { max-width: 80vw; }
+}
+
+/* ============================================
+   Why me — a list: one row per point, title (number included)
+   left, description right, 1px dividers that bounce when the cursor crosses
+   them (Osmo Elastic Line)
+   ============================================ */
+/* Below: twice the section space, the gap between sections elsewhere on the page. */
+.why-list { padding-block: var(--space-section) calc(var(--space-section) * 2); }
+
+.why-list__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 1px, the surrounding text colour at 15%, see-through, so it sits on any
+   ground (the path strokes currentColor). It flashes to the accent when it
+   bounces, then fades back (js/osmo/elastic-line.js). */
+.why-list__line {
+  --elastic-line-flash: var(--accent);
+  height: 1px;
+  color: color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.why-list__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--space-6);
+  padding-block: var(--space-8);
+}
+
+.why-list__text {
+  max-width: 32em;
+  color: var(--text-3);
+}
+
+@media (max-width: 767px) {
+  .why-list__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+    padding-block: var(--space-6);
+  }
+}
+
+/* ============================================
+   Globe — Osmo Globe Gallery, centred, site radius on the cards
+   ============================================ */
+.globe {
+  display: flex;
+  justify-content: center;
+  padding-inline: var(--container-pad);
+  overflow: clip;
+}
+.globe-gallery__item { border-radius: var(--radius-sm); }
+/* A wider gap between the cards (Osmo: 1em, 0.25em on phones); the script
+   reads it from the list. */
+.globe-gallery__list { gap: 1.5em; }
+@media (max-width: 767px) {
+  .globe-gallery__list { gap: 0.5em; }
+}
+/* Draggable sideways (js/osmo/globe-gallery.js); vertical swipes still scroll. */
+.globe-gallery {
+  cursor: grab;
+  touch-action: pan-y;
+}
+.globe-gallery[data-globe-gallery-dragging] { cursor: grabbing; }
+
+/* ============================================
+   Final call to action
+   ============================================ */
+/* Twice the section space on both sides, as above the globe and between
+   sections elsewhere on the page. */
+.cta { padding-block: calc(var(--space-section) * 2); }
+.cta__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+}
+.cta__title { max-width: 12em; }
+.cta__text { color: var(--text-3); }
+.cta__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+/* ============================================
+   Footer — a card on the navigation bar's blurred surface, over a large
+   "Olena Bosoi" set like the hero name. The name's top runs under the card.
+   ============================================ */
+.footer {
+  position: relative;
+  /* Clips the letters while they sit below the page edge (see js/main.js). */
+  overflow: clip;
+}
+
+.footer__card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-card);
+  border-radius: var(--radius-lg);
+  background-color: var(--surface-blur);
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+}
+
+.footer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-8);
+}
+.footer__col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.footer__heading { margin-bottom: var(--space-2); }
+.footer__text {
+  max-width: 24em;
+  color: var(--text-3);
+}
+
+.footer__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.footer__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color var(--duration-fast) ease;
+}
+.footer__link:hover { color: var(--text-1); }
+
+.footer__icon {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* A solid icon (LinkedIn): filled in the link colour, no outline. */
+.footer__icon.is--fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.footer__line {
+  --elastic-line-flash: var(--accent);
+  height: 1px;
+  color: color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.footer__bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr);
+  gap: var(--space-8);
+  font-size: var(--fs-body-sm);
+  color: var(--text-3);
+}
+
+/* The name sits on the page's bottom edge; its top 40% (of the letter height)
+   runs under the card. */
+.footer__name-wrap { display: flex; justify-content: center; }
+.footer__name { margin-top: -0.3em; }
+/* Phones: the name sits clear below the card instead of running under it. */
+@media (max-width: 767px) {
+  .footer__name { margin-top: var(--space-8); }
+}
+
+/* Phones: the brand column across the top, Quick links and Social side by side below. */
+@media (max-width: 767px) {
+  .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer__col.is--brand { grid-column: 1 / -1; }
+  .footer__bottom { grid-template-columns: minmax(0, 1fr); }
+  .footer__bottom { gap: var(--space-2); }
+}
+
+/* Banner zoom (Osmo Click to Zoom): above the navigation, site palette and radius. */
+.click-zoom__lightbox {
+  z-index: 200;
+  background-color: color-mix(in srgb, var(--bg) 90%, transparent);
+}
+[data-click-zoom-lightbox] > img { border-radius: var(--radius-md); }
+
+
+/* ============================================
+   Loader — site styling on top of the Osmo component
+   ============================================ */
+.loading-screen { color: var(--text-1); }
+.loading-screen__background { background-color: var(--bg); }
+
+/* Progress bar where Osmo has the logo. It starts filling from the first paint,
+   in CSS, so something moves while the scripts and photos load; js/main.js
+   (playLoader) fills the rest once the cards start. */
+.loading-screen__progress {
+  position: absolute;
+  bottom: var(--space-12);
+  width: min(12rem, 40vw);
+  height: 2px;
+  overflow: hidden;
+  border-radius: 1px;
+  background-color: var(--line);
+}
+.loading-screen__progress-fill {
+  height: 100%;
+  background-color: var(--fg);
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: loading-progress 4s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+}
+/* Slows down towards 90% and waits there for the scripts. */
+@keyframes loading-progress {
+  to { transform: scaleX(0.9); }
+}
+
+/* Cards in 4:5, the crop of the photos (Osmo: 3:4). */
+.loading-screen__card { aspect-ratio: 4 / 5; }
+
+/* Phones: cards 20% smaller (Osmo: font-size max(1.5vw, 2em), so 2em here). */
+@media (max-width: 767px) {
+  .loading-screen__card { font-size: 1.6em; }
+}
+
+/* ============================================
+   Intro states — only while html.is-intro is set (see the inline script in <head>)
+   ============================================ */
+html:not(.is-intro) [data-loading-container] { display: none; }
+
+html.is-loading { overflow: hidden; }
+
+html.is-intro [data-hero-content],
+html.is-intro [data-hero-name],
+html.is-intro [data-intro-nav] { visibility: hidden; }
+
+/* Cursor (Osmo Basic Custom Cursor): the text colour instead of Osmo's
+   orange, and above everything, the banner zoom and loader included. Over
+   links and banners it grows to 4em (Osmo: 3em). */
+.cursor {
+  z-index: 300;
+  background-color: var(--accent-ui);
+  border-color: var(--accent-ui);
+}
+body:has( a:hover) .cursor,
+body:has( button:hover) .cursor,
+body:has( [data-cursor]:hover) .cursor {
+  width: 4em;
+  height: 4em;
+  background-color: color-mix(in srgb, var(--accent-ui) 20%, transparent);
+}
+/* The banners open in the lightbox (Click to Zoom), so they take the
+   cursor's hover state too, the same as links. */
+body:has( [data-click-zoom]:hover) .cursor {
+  width: 4em;
+  height: 4em;
+  background-color: color-mix(in srgb, var(--accent-ui) 20%, transparent);
+}
+
+/* Phones: the hero's "Olena Bosoi" has no shimmer (js/main.js) and sits at
+   the headings' weight. --wght-min too, as the letters take their weight
+   from it until a shimmer or hover sets --wght. The footer name keeps its
+   usual range and shimmer. */
+@media screen and (max-width: 767px) {
+  .hero .hero__name {
+    --wght-min: 500;
+    font-weight: 500;
+  }
+}
+
+/* Phones: smaller eyebrows, closer to the heading under them, and body
+   text a little tighter (1.3 instead of 1.4). */
+@media screen and (max-width: 767px) {
+  :root { --fs-eyebrow: 1.5rem; --lh-base: 1.3; }
+  *:has(> .eyebrow) { gap: var(--space-3); }
+}

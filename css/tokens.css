@@ -1,0 +1,144 @@
+/* ============================================
+   olenabosoi.com — Design Tokens
+   Single source of truth. In Webflow these map 1:1 to Variables
+   (Colors / Typography / Spacing / Sizes / Radius collections).
+   ============================================ */
+
+/* The site's own fonts are named apart from the installed copies ("VAR",
+   "Web"), so a copy on the computer under the real name is never picked. */
+
+/* ZT Nature (Zelowtype), variable: all the text but the eyebrows. */
+@font-face {
+  font-family: "ZT Nature VAR";
+  src: url("../fonts/ZTNatureVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ZT Bros Oskon 90s Light Italic (Zelow Type): the eyebrows. */
+@font-face {
+  font-family: "ZT Bros Oskon Web";
+  src: url("../fonts/ZTBrosOskon90s-LightItalic.woff2") format("woff2");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* ---- Color: four primitives, every other colour mixed from them ----
+     Change these four to recolour the whole site. Plain colour values only
+     (hex), as the colour wave reads --accent straight into its animation. */
+  --bg: #000000;          /* the page ground */
+  --fg: #ffffff;          /* the text */
+  --accent: #ffffff;      /* buttons, the headings' colour wave, the name
+                             shimmer's peak, the Work ring and the cursor */
+  --accent-text: #000000; /* text on the accent (button labels) */
+
+  --text-1: var(--fg);
+  --text-2: color-mix(in srgb, var(--fg) 70%, var(--bg));
+  --text-3: color-mix(in srgb, var(--fg) 60%, var(--bg));
+  --text-4: color-mix(in srgb, var(--fg) 25%, var(--bg));
+
+  /* Raised from 5 / 10 / 15%: the cards stay apart from the page in bright light. */
+  --surface-1: color-mix(in srgb, var(--fg) 8%, var(--bg));
+  --surface-2: color-mix(in srgb, var(--fg) 14%, var(--bg));
+  --surface-3: color-mix(in srgb, var(--fg) 20%, var(--bg));
+
+  --line-soft: color-mix(in srgb, var(--fg) 10%, var(--bg));
+  --line: color-mix(in srgb, var(--fg) 15%, var(--bg));
+  --line-strong: color-mix(in srgb, var(--fg) 30%, var(--bg));
+
+  --accent-hover: color-mix(in srgb, var(--accent) 85%, var(--accent-text));
+  /* Accent for small moving details: the Work ring's line, its active dot,
+     flash and ripples, the card orbs and the cursor. */
+  --accent-ui: var(--accent);
+  /* Services and Process cards: two quiet tones, alternating card by card. */
+  --card-1: color-mix(in srgb, var(--fg) 5%, var(--bg));
+  --card-2: color-mix(in srgb, var(--fg) 8%, var(--bg));
+  /* A colour laid over the hero photo in the "color" blend mode, tinting it
+     while keeping its light and shade. None by default. */
+  --hero-tint: transparent;
+  --hero-tint-blend: color;
+  /* Eyebrows over the hero photo: see-through text colour by default. */
+  --hero-eyebrow: color-mix(in srgb, var(--fg) 60%, transparent);
+  /* Eyebrows (section labels). */
+  --text-eyebrow: var(--text-3);
+  /* The call-to-action card in the open menu, and its button: the card in
+     the accent, the button the other way round. */
+  --nav-card-bg: var(--accent);
+  --nav-card-text: var(--accent-text);
+  --nav-card-button: var(--accent-text);
+  --nav-card-button-text: var(--accent);
+
+  /* Blurred surface for things that sit over moving content (the menu bar,
+     the disc under the Work ring): a 30% grey at 50%, over a 30px blur.
+     A little lighter than the menu bar on monologue.framer.website (24% at
+     40%), so it shows in bright light. */
+  --surface-blur: color-mix(in srgb, color-mix(in srgb, var(--fg) 30%, var(--bg)) 50%, transparent);
+  --blur: 30px;
+
+  /* ---- Typography: ZT Nature throughout, ZT Bros Oskon for eyebrows ---- */
+  --font-sans: "ZT Nature VAR", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-eyebrow: "ZT Bros Oskon Web", var(--font-sans);
+  --font-body: var(--font-sans);
+
+  /* Fluid from 390px to 1200px. */
+  --fs-h1: clamp(2.5rem, 1.778rem + 2.963vw, 4rem);       /* 40 -> 64 */
+  --fs-h2: clamp(2.25rem, 1.407rem + 3.457vw, 4rem);      /* 36 -> 64: twice the card headings (h4, 32) */
+  --fs-h3: clamp(1.75rem, 1.509rem + 0.988vw, 2.25rem);   /* 28 -> 36 */
+  --fs-h4: clamp(1.25rem, 0.889rem + 1.481vw, 2rem);      /* 20 -> 32 */
+  --fs-h5: clamp(1.25rem, 1.130rem + 0.494vw, 1.5rem);    /* 20 -> 24 */
+  --fs-h6: clamp(1.125rem, 1.065rem + 0.247vw, 1.25rem);  /* 18 -> 20 */
+  --fs-eyebrow: 2rem;                                      /* 32 */
+  --fs-body-lg: clamp(1.125rem, 1.005rem + 0.494vw, 1.375rem);
+  --fs-body: 1rem;
+  --fs-body-sm: 0.875rem;
+
+  --lh-tight: 1;
+  --lh-heading: 1.1;
+  --lh-base: 1.4;
+
+  /* ---- Spacing (8-based; from artem.design) ---- */
+  --space-1: 0.25rem;  /*  4 */
+  --space-2: 0.5rem;   /*  8 */
+  --space-3: 0.75rem;  /* 12 */
+  --space-4: 1rem;     /* 16 */
+  --space-6: 1.5rem;   /* 24 */
+  --space-8: 2rem;     /* 32 */
+  --space-10: 2.5rem;  /* 40 */
+  --space-12: 3rem;    /* 48 */
+  --space-16: 4rem;    /* 64 */
+  --space-20: 5rem;    /* 80 */
+  --space-24: 6rem;    /* 96 */
+  --space-32: 8rem;    /* 128 */
+
+  /* Between sections, and the three nested insets (page > plate > panel). */
+  --space-section: clamp(4rem, 2.5rem + 7vw, 6rem);
+  --space-card: clamp(var(--space-6), 6vw, var(--space-16));
+  --space-inner: clamp(var(--space-4), 3vw, var(--space-12));
+  --space-element: clamp(var(--space-2), 3vw, var(--space-6));
+  /* Air around scroll-driven sections: a quarter of the screen, never less than 6rem. */
+  --space-air: max(var(--space-24), 25svh);
+  /* Vertical rhythm between the main blocks of a section: header, body, footer. */
+  --section-gap: clamp(2.25rem, 1rem + 4vw, 4rem);
+
+  /* ---- Layout ---- */
+  --container-max: 80rem;           /* 1280px */
+  --container-pad: clamp(1rem, 4vw, 3rem);
+  --grid-gap: 1rem;
+
+  /* ---- Radius: small objects, cards, large blocks ---- */
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 2rem;
+
+  /* ---- Motion ---- */
+  --ease-osmo: cubic-bezier(0.625, 0.05, 0, 1);
+  --duration-fast: 250ms;
+  --duration-base: 400ms;
+  --duration-slow: 625ms;
+
+  color-scheme: dark;
+}

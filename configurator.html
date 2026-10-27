@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Site Configurator | Olena Bosoi</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="css/tokens.css">
+  <script src="js/site-config.js"></script>
+  <style>
+    /* The configurator's own look: the site's fonts and neutral greys, so the
+       chosen colours only show in the preview. */
+    :root {
+      --c-bg: #0d0d0d;
+      --c-panel: #151515;
+      --c-field: #1f1f1f;
+      --c-line: #2a2a2a;
+      --c-text: #f2f2f2;
+      --c-muted: #9a9a9a;
+      --c-primary: #ffffff;
+      --c-primary-text: #000000;
+      --c-ok: #8fe3a5;
+      --c-warn: #ffcf70;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      background: var(--c-bg);
+      color: var(--c-text);
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.4;
+      /* ZT Nature is set tight for large headings; open it up at these small sizes. */
+      letter-spacing: 0.02em;
+      display: grid;
+      grid-template-columns: 22rem minmax(0, 1fr);
+    }
+    /* Panel hidden: the preview takes the whole window. */
+    body.is--collapsed { grid-template-columns: 0 minmax(0, 1fr); }
+    body.is--collapsed .panel { visibility: hidden; overflow: hidden; border: 0; }
+    button, input, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; }
+    button { cursor: pointer; }
+
+    /* ---- Panel ---- */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      height: 100vh;
+      background: var(--c-panel);
+      border-right: 1px solid var(--c-line);
+    }
+    .panel__scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+    .panel__head h1 { margin: 0; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.01em; }
+    .group { display: flex; flex-direction: column; gap: 0.75rem; }
+    .group__title {
+      margin: 0;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+    }
+
+    /* Presets */
+    .presets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+    .preset {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      padding: 0.625rem;
+      border: 1px solid var(--c-line);
+      border-radius: 0.625rem;
+      background: var(--c-field);
+      text-align: left;
+    }
+    .preset[aria-pressed="true"] { border-color: var(--c-text); }
+    .preset__swatch {
+      flex: none;
+      display: grid;
+      grid-template-columns: repeat(2, 0.75rem);
+      gap: 2px;
+      padding: 3px;
+      border-radius: 0.375rem;
+    }
+    .preset__swatch span { width: 0.75rem; height: 0.75rem; border-radius: 50%; }
+    /* The swatch turns a quarter on hover. */
+    .preset__swatch { transition: transform 0.5s var(--ease-osmo); }
+    @media (hover: hover) {
+      .preset:hover .preset__swatch { transform: rotate(90deg); }
+    }
+
+    /* Colours */
+    .color-row { display: grid; grid-template-columns: minmax(0, 1fr) auto 6.5rem; align-items: center; gap: 0.5rem; }
+    .color-row label { color: var(--c-text); }
+    .color-row small { display: block; color: var(--c-muted); }
+    input[type="color"] {
+      width: 2.25rem;
+      height: 2.25rem;
+      padding: 0;
+      border: 1px solid var(--c-line);
+      border-radius: 0.5rem;
+      background: none;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 3px; }
+    input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 0.3rem; }
+    .text-field, select, textarea {
+      width: 100%;
+      padding: 0.5rem 0.625rem;
+      border: 1px solid var(--c-line);
+      border-radius: 0.5rem;
+      background: var(--c-field);
+    }
+    .text-field { font-family: ui-monospace, Menlo, monospace; font-size: 0.8125rem; text-transform: lowercase; }
+    .text-field[aria-invalid="true"] { border-color: var(--c-warn); }
+
+    /* Switches */
+    .switch { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .switch input {
+      appearance: none;
+      flex: none;
+      position: relative;
+      width: 2.5rem;
+      height: 1.5rem;
+      margin: 0;
+      border-radius: 1rem;
+      background: var(--c-line);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .switch input::after {
+      content: "";
+      position: absolute;
+      top: 0.1875rem;
+      left: 0.1875rem;
+      width: 1.125rem;
+      height: 1.125rem;
+      border-radius: 50%;
+      background: var(--c-text);
+      transition: transform 0.2s;
+    }
+    .switch input:checked { background: var(--c-ok); }
+    .switch input:checked::after { transform: translateX(1rem); background: #0d0d0d; }
+
+    /* Hero photos */
+    .photos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; }
+    .photo {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--c-line);
+      border-radius: 0.5rem;
+      background: var(--c-field) center / cover no-repeat;
+    }
+    .photo[aria-pressed="true"] { outline: 2px solid var(--c-text); outline-offset: 2px; }
+    .photo__label {
+      position: absolute;
+      inset: auto 0 0;
+      padding: 0.25rem;
+      font-size: 0.6875rem;
+      color: var(--c-text); /* kept when the upload tile hides its "+" */
+      background: linear-gradient(transparent, rgb(0 0 0 / 0.7));
+    }
+    .photo.is--upload { display: grid; place-items: center; color: var(--c-muted); font-size: 1.25rem; }
+    .photo.is--upload.has--image { color: transparent; }
+    .range { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr) 2.75rem; align-items: center; gap: 0.5rem; }
+    .range output { text-align: right; color: var(--c-muted); font-variant-numeric: tabular-nums; }
+    input[type="range"] { width: 100%; accent-color: var(--c-text); }
+
+    .segmented { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; border-radius: 0.5rem; background: var(--c-field); border: 1px solid var(--c-line); }
+    .segmented button { padding: 0.375rem; border: 0; border-radius: 0.375rem; background: none; color: var(--c-muted); }
+    .segmented button[aria-pressed="true"] { background: var(--c-line); color: var(--c-text); }
+    .is--disabled { opacity: 0.4; pointer-events: none; }
+
+    details summary { cursor: pointer; color: var(--c-muted); }
+    details textarea { margin-top: 0.5rem; min-height: 7rem; font-family: ui-monospace, Menlo, monospace; font-size: 0.75rem; resize: vertical; }
+    details .button { margin-top: 0.5rem; }
+
+    /* Actions */
+    .panel__actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--c-line);
+      background: var(--c-panel);
+    }
+    .button {
+      padding: 0.6875rem 0.75rem;
+      border: 1px solid var(--c-line);
+      border-radius: 0.625rem;
+      background: var(--c-field);
+    }
+    /* Only the main button is Medium. */
+    .button.is--primary { font-weight: 500; border-color: var(--c-primary); background: var(--c-primary); color: var(--c-primary-text); }
+    .button.is--primary:disabled { opacity: 0.35; cursor: default; }
+    /* Copy and Reset side by side, compact. */
+    .panel__actions .button { padding: 0.5rem 0.75rem; font-size: 0.8125rem; }
+    .button:disabled { opacity: 0.35; cursor: default; }
+    /* Messages only (copied, an error); empty otherwise. */
+    .status { grid-column: 1 / -1; margin: 0; color: var(--c-muted); font-size: 0.8125rem; }
+    .status:empty { display: none; }
+    .status.is--dirty { color: var(--c-warn); }
+    .status.is--ok { color: var(--c-ok); }
+
+    /* ---- Preview ---- */
+    .preview { display: flex; flex-direction: column; min-width: 0; height: 100vh; }
+    .preview__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.625rem 1rem;
+      border-bottom: 1px solid var(--c-line);
+    }
+    .preview__bar .segmented { width: 12rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .preview__bar a { color: var(--c-muted); }
+    .preview__bar .button { padding: 0.375rem 0.75rem; }
+    .preview__stage { flex: 1; display: flex; justify-content: center; min-height: 0; background: #070707; }
+    .preview__bar-start { display: flex; align-items: center; gap: 0.75rem; }
+    .preview__device { position: relative; flex: none; width: 100%; height: 100%; overflow: hidden; }
+    .preview__frame { display: block; width: 100%; height: 100%; border: 0; background: #000; }
+    /* Mobile: a 390 x 844 screen (iPhone 14 / 15) with rounded corners, the
+       site laid out at that width, scaled down to fit the stage. */
+    .preview__stage.is--mobile { align-items: center; padding: 1.5rem; overflow: hidden; }
+    .preview__stage.is--mobile .preview__device {
+      width: 390px;
+      height: 844px;
+      border-radius: 3.5rem;
+      box-shadow: 0 0 0 1px var(--c-line), 0 0 0 0.625rem #1a1a1a, 0 0 0 calc(0.625rem + 1px) var(--c-line);
+      transform: scale(var(--device-scale, 1));
+    }
+
+    @media (max-width: 860px) {
+      body { display: block; height: auto; }
+      .panel, .preview { height: auto; }
+      .panel__actions { position: sticky; bottom: 0; }
+      .preview__stage { height: 80vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="panel">
+    <div class="panel__scroll">
+      <header class="panel__head">
+        <h1>Olena's style settings</h1>
+      </header>
+
+      <section class="group">
+        <h2 class="group__title">Presets</h2>
+        <div class="presets" data-presets></div>
+      </section>
+
+      <section class="group">
+        <h2 class="group__title">Colours</h2>
+        <div data-colors></div>
+      </section>
+
+      <section class="group">
+        <h2 class="group__title">Labels</h2>
+        <label class="switch">Section labels in the accent <input type="checkbox" data-field="eyebrowAccent"></label>
+        <label class="switch">Hero labels in the accent <input type="checkbox" data-field="heroEyebrowAccent"></label>
+      </section>
+
+      <section class="group">
+        <h2 class="group__title">Hero photo</h2>
+        <div class="photos" data-photos></div>
+        <input type="file" accept="image/*" hidden data-upload>
+        <div class="range"><label for="focus-x">Focus ↔</label><input id="focus-x" type="range" min="0" max="100" data-focus="0"><output data-focus-out="0"></output></div>
+        <div class="range"><label for="focus-y">Focus ↕</label><input id="focus-y" type="range" min="0" max="100" data-focus="1"><output data-focus-out="1"></output></div>
+      </section>
+
+      <section class="group">
+        <h2 class="group__title">Overlay on the hero photo</h2>
+        <label class="switch">Overlay <input type="checkbox" data-overlay="on"></label>
+        <div class="group" data-overlay-settings>
+          <div class="segmented" data-overlay-color>
+            <button type="button" data-value="bg">Background</button>
+            <button type="button" data-value="accent">Accent</button>
+            <button type="button" data-value="fg">Text</button>
+          </div>
+          <div class="range"><label for="overlay-strength">Strength</label><input id="overlay-strength" type="range" min="0" max="100" data-overlay="strength"><output data-overlay-out></output></div>
+          <div class="range"><label for="overlay-blend">Blend</label>
+            <select id="overlay-blend" data-overlay="blend" style="grid-column: span 2">
+              <option value="color">Color</option>
+              <option value="normal">Normal</option>
+              <option value="multiply">Multiply</option>
+              <option value="overlay">Overlay</option>
+              <option value="soft-light">Soft light</option>
+              <option value="screen">Screen</option>
+              <option value="hue">Hue</option>
+              <option value="saturation">Saturation</option>
+              <option value="luminosity">Luminosity</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <details>
+        <summary>Paste settings</summary>
+        <textarea data-import placeholder="Paste copied settings here"></textarea>
+        <button type="button" class="button" data-import-load>Load settings</button>
+      </details>
+    </div>
+
+    <div class="panel__actions">
+      <button type="button" class="button is--primary" data-copy>Copy settings</button>
+      <button type="button" class="button" data-reset>Reset</button>
+      <p class="status" data-status role="status"></p>
+    </div>
+  </aside>
+
+  <main class="preview">
+    <div class="preview__bar">
+      <div class="preview__bar-start">
+        <button type="button" class="button" data-collapse aria-pressed="false">Hide panel</button>
+        <div class="segmented" data-device>
+          <button type="button" data-value="desktop" aria-pressed="true">Desktop</button>
+          <button type="button" data-value="mobile">Mobile</button>
+        </div>
+      </div>
+      <a href="index.html?preview" target="_blank" rel="noopener">Open in a new tab</a>
+    </div>
+    <div class="preview__stage" data-stage>
+      <div class="preview__device" data-device-frame>
+        <iframe class="preview__frame" src="index.html?preview" title="Site preview" data-frame></iframe>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var C = window.SiteConfig;
+      var $ = function (sel) { return document.querySelector(sel); };
+      var $$ = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+
+      var COLORS = [
+        { key: "bg", label: "Background", hint: "The page ground" },
+        { key: "fg", label: "Text", hint: "Headings and copy" },
+        { key: "accent", label: "Accent", hint: "Buttons, wave, ring flash" },
+        { key: "accentText", label: "Text on accent", hint: "Button labels" },
+      ];
+
+      // Every change is saved and shown in the preview at once (applyLive in
+      // js/site-config.js). The site's scripts read the colours only on load
+      // (the headings' wave, the name shimmer, the card orbs), so once a colour
+      // change settles the preview reloads, quietly, keeping its scroll.
+      var config = C.load();
+      var customImage = C.loadImage();  // the uploaded hero photo, if any
+      var frame = $("[data-frame]");
+      var colorsKey = function (c) { return [c.bg, c.fg, c.accent, c.accentText].join(); };
+      var loadedColors = colorsKey(config); // the colours the preview's scripts loaded with
+
+      // ---- Build the controls ----
+      var presetsEl = $("[data-presets]");
+      Object.keys(C.PRESETS).forEach(function (key) {
+        var p = C.PRESETS[key];
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "preset";
+        b.dataset.preset = key;
+        b.innerHTML = '<span class="preset__swatch" style="background:' + p.bg + '">' +
+          [p.bg, p.fg, p.accent, p.accentText].map(function (c) {
+            return '<span style="background:' + c + ';box-shadow:0 0 0 1px rgb(255 255 255 / 0.15)"></span>';
+          }).join("") + "</span>" + p.label;
+        b.addEventListener("click", function () {
+          config = C.fromPreset(key);
+          update({ reload: 0 });
+        });
+        presetsEl.appendChild(b);
+      });
+
+      var colorsEl = $("[data-colors]");
+      COLORS.forEach(function (c) {
+        var row = document.createElement("div");
+        row.className = "color-row";
+        row.innerHTML = '<label for="c-' + c.key + '">' + c.label + "<small>" + c.hint + "</small></label>" +
+          '<input type="color" id="c-' + c.key + '" data-color="' + c.key + '">' +
+          '<input type="text" class="text-field" maxlength="7" spellcheck="false" aria-label="' + c.label + ' hex" data-hex="' + c.key + '">';
+        colorsEl.appendChild(row);
+      });
+      colorsEl.style.display = "grid";
+      colorsEl.style.gap = "0.75rem";
+
+      var photosEl = $("[data-photos]");
+      Object.keys(C.HERO_IMAGES).forEach(function (key) {
+        var img = C.HERO_IMAGES[key];
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "photo";
+        b.dataset.photo = key;
+        b.style.backgroundImage = "url('" + img.src + "')";
+        b.innerHTML = '<span class="photo__label">' + img.label + "</span>";
+        b.addEventListener("click", function () {
+          config.hero = { image: key, focus: img.focus.slice() };
+          edited();
+        });
+        photosEl.appendChild(b);
+      });
+      var uploadTile = document.createElement("button");
+      uploadTile.type = "button";
+      uploadTile.className = "photo is--upload";
+      uploadTile.dataset.photo = "custom";
+      uploadTile.innerHTML = '+<span class="photo__label">Upload</span>';
+      uploadTile.addEventListener("click", function () {
+        // A second click on an uploaded photo picks a new file.
+        if (config.hero.image === "custom" || !customImage) $("[data-upload]").click();
+        else { config.hero = { image: "custom", focus: [50, 50] }; edited(); }
+      });
+      photosEl.appendChild(uploadTile);
+
+
+      // Uploads are scaled down (2400px on the long side, JPEG) so they fit in
+      // the browser's storage.
+      $("[data-upload]").addEventListener("change", function (e) {
+        var file = e.target.files[0];
+        e.target.value = "";
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var im = new Image();
+          im.onload = function () {
+            var scale = Math.min(1, 2400 / Math.max(im.width, im.height));
+            var canvas = document.createElement("canvas");
+            canvas.width = Math.round(im.width * scale);
+            canvas.height = Math.round(im.height * scale);
+            canvas.getContext("2d").drawImage(im, 0, 0, canvas.width, canvas.height);
+            var data = canvas.toDataURL("image/jpeg", 0.85);
+            if (!C.save(config, data)) {
+              flash("The browser didn't keep the photo. Try a smaller one, or a normal (not private) window.", "is--dirty");
+              return;
+            }
+            customImage = data;
+            config.hero = { image: "custom", focus: [50, 50] };
+            edited();
+          };
+          im.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // ---- Read the controls ----
+      // Saves, shows the change in the preview, and (opts.reload, in ms) reloads
+      // the preview after that long if the colours differ from its last load.
+      var reloadTimer;
+      function update(opts) {
+        opts = opts || {};
+        if (!C.save(config)) flash("The browser didn't save the settings (a private window?).", "is--dirty");
+        try { frame.contentWindow.SiteConfig.applyLive(config); } catch (e) {}
+        render(opts.skipHex);
+        if (opts.reload !== undefined) scheduleReload(opts.reload);
+      }
+      function scheduleReload(delay) {
+        clearTimeout(reloadTimer);
+        reloadTimer = setTimeout(function () {
+          if (colorsKey(config) === loadedColors) return;
+          loadedColors = colorsKey(config);
+          frame.contentWindow.location.reload();
+        }, delay);
+      }
+      function edited(opts) {
+        config.edited = true;
+        update(opts);
+      }
+
+      // The colour picker: live while it's open, the reload once it closes.
+      $$("[data-color]").forEach(function (input) {
+        input.addEventListener("input", function () {
+          config[input.dataset.color] = input.value;
+          edited();
+        });
+        input.addEventListener("change", function () { scheduleReload(300); });
+      });
+      $$("[data-hex]").forEach(function (input) {
+        input.addEventListener("input", function () {
+          var v = input.value.trim().toLowerCase();
+          if (v && v[0] !== "#") v = "#" + v;
+          var ok = /^#[0-9a-f]{6}$/.test(v);
+          input.setAttribute("aria-invalid", ok ? "false" : "true");
+          if (ok) { config[input.dataset.hex] = v; edited({ skipHex: input, reload: 800 }); }
+        });
+      });
+      $$("[data-field]").forEach(function (input) {
+        input.addEventListener("change", function () {
+          config[input.dataset.field] = input.checked;
+          edited();
+        });
+      });
+      $$("[data-focus]").forEach(function (input) {
+        input.addEventListener("input", function () {
+          config.hero.focus[Number(input.dataset.focus)] = Number(input.value);
+          edited();
+        });
+      });
+      $("[data-overlay='on']").addEventListener("change", function (e) {
+        config.overlay.on = e.target.checked;
+        edited();
+      });
+      $("[data-overlay='strength']").addEventListener("input", function (e) {
+        config.overlay.strength = Number(e.target.value);
+        edited();
+      });
+      $("[data-overlay='blend']").addEventListener("change", function (e) {
+        config.overlay.blend = e.target.value;
+        edited();
+      });
+      $$("[data-overlay-color] button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          config.overlay.color = b.dataset.value;
+          edited();
+        });
+      });
+
+      // ---- Show the state ----
+      function render(skipHex) {
+        $$("[data-preset]").forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b.dataset.preset === config.preset && !config.edited));
+        });
+        COLORS.forEach(function (c) {
+          $("[data-color='" + c.key + "']").value = config[c.key];
+          var hex = $("[data-hex='" + c.key + "']");
+          if (hex !== skipHex) { hex.value = config[c.key]; hex.setAttribute("aria-invalid", "false"); }
+        });
+        $$("[data-field]").forEach(function (input) { input.checked = !!config[input.dataset.field]; });
+
+        $$("[data-photo]").forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b.dataset.photo === config.hero.image));
+        });
+        var custom = customImage;
+        uploadTile.classList.toggle("has--image", !!custom);
+        uploadTile.style.backgroundImage = custom ? "url('" + custom + "')" : "";
+        // With a photo in: "Replace" when it's the one shown, else "Your photo".
+        uploadTile.querySelector(".photo__label").textContent = !custom ? "Upload"
+          : config.hero.image === "custom" ? "Replace" : "Your photo";
+        $$("[data-focus]").forEach(function (input) {
+          var i = Number(input.dataset.focus);
+          input.value = config.hero.focus[i];
+          $("[data-focus-out='" + i + "']").textContent = config.hero.focus[i] + "%";
+        });
+
+        var o = config.overlay;
+        $("[data-overlay='on']").checked = o.on;
+        $("[data-overlay-settings]").classList.toggle("is--disabled", !o.on);
+        $$("[data-overlay-color] button").forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b.dataset.value === o.color));
+        });
+        $("[data-overlay='strength']").value = o.strength;
+        $("[data-overlay-out]").textContent = o.strength + "%";
+        $("[data-overlay='blend']").value = o.blend;
+
+        $("[data-reset]").disabled = !config.edited && !customImage;
+      }
+
+      var statusTimer;
+      function setStatus(text, kind) {
+        var el = $("[data-status]");
+        el.textContent = text;
+        el.className = "status " + (kind || "");
+      }
+      function flash(text, kind) {
+        clearTimeout(statusTimer);
+        setStatus(text, kind);
+        statusTimer = setTimeout(function () { setStatus(""); }, 2500);
+      }
+
+      // ---- Actions ----
+      // Back to the preset the edits started from, and the uploaded photo
+      // removed from the browser's storage.
+      $("[data-reset]").addEventListener("click", function () {
+        config = C.fromPreset(config.preset);
+        customImage = null;
+        C.save(config, null);
+        update({ reload: 0 });
+      });
+
+      function settingsText() {
+        var out = JSON.parse(JSON.stringify(config));
+        delete out.edited;
+        out.basedOn = (C.PRESETS[out.preset] || C.PRESETS.main).label + (config.edited ? " (edited)" : "");
+        delete out.preset;
+        if (out.hero.image === "custom") out.hero.note = "Uploaded photo: send the file separately";
+        return "Olena Bosoi site settings\n" + JSON.stringify(out, null, 2);
+      }
+
+      $("[data-copy]").addEventListener("click", function () {
+        var text = settingsText();
+        var fallback = function () {
+          var area = $("[data-import]");
+          area.closest("details").open = true;
+          area.value = text;
+          area.select();
+          flash("Couldn't copy automatically: the settings are selected below, copy them by hand.", "is--dirty");
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { flash("Settings copied.", "is--ok"); }, fallback);
+        } else fallback();
+      });
+
+      $("[data-import-load]").addEventListener("click", function () {
+        var raw = $("[data-import]").value;
+        try {
+          var data = JSON.parse(raw.slice(raw.indexOf("{")));
+          var base = Object.keys(C.PRESETS).filter(function (k) {
+            return data.basedOn && data.basedOn.indexOf(C.PRESETS[k].label) === 0;
+          }).sort(function (a, b) { return C.PRESETS[b].label.length - C.PRESETS[a].label.length; })[0] || "main";
+          var next = C.fromPreset(base);
+          ["bg", "fg", "accent", "accentText", "textMix", "eyebrowAccent", "heroEyebrowAccent"].forEach(function (k) {
+            if (data[k] !== undefined) next[k] = data[k];
+          });
+          if (data.hero && C.HERO_IMAGES[data.hero.image]) next.hero = { image: data.hero.image, focus: data.hero.focus || C.HERO_IMAGES[data.hero.image].focus.slice() };
+          if (data.overlay) next.overlay = Object.assign(next.overlay, data.overlay);
+          next.edited = true;
+          config = next;
+          update({ reload: 0 });
+          flash("Settings loaded.", "is--ok");
+        } catch (e) {
+          flash("Those settings couldn't be read.", "is--dirty");
+        }
+      });
+
+      // The phone screen keeps its size (so the site lays out as on a phone)
+      // and is scaled down to fit the stage, the bezel included.
+      var stage = $("[data-stage]");
+      function fitDevice() {
+        if (!stage.classList.contains("is--mobile")) return;
+        var pad = 48 + 24; // the stage's padding, and the bezel
+        var scale = Math.min(1, (stage.clientHeight - pad) / 844, (stage.clientWidth - pad) / 390);
+        $("[data-device-frame]").style.setProperty("--device-scale", Math.max(0.3, scale));
+      }
+      window.addEventListener("resize", fitDevice);
+      $$("[data-device] button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          $$("[data-device] button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+          stage.classList.toggle("is--mobile", b.dataset.value === "mobile");
+          fitDevice();
+        });
+      });
+
+      $("[data-collapse]").addEventListener("click", function (e) {
+        var collapsed = document.body.classList.toggle("is--collapsed");
+        e.currentTarget.textContent = collapsed ? "Show panel" : "Hide panel";
+        e.currentTarget.setAttribute("aria-pressed", String(collapsed));
+        fitDevice();
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

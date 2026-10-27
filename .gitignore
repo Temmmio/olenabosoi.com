@@ -1,0 +1,11 @@
+# Build output and tools
+node_modules/
+dist/
+
+# Working material, not part of the site
+assets for website/
+_old-versions/
+docs/
+.claude/
+
+.DS_Store
