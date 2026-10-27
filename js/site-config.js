@@ -125,6 +125,8 @@
       ? "color-mix(in srgb, var(" + (OVERLAY_COLORS[overlay.color] || "--bg") + ") " + overlay.strength + "%, transparent)"
       : "transparent");
     set("--hero-tint-blend", overlay.blend || "color");
+    // Corner rounding, in % of the design (100 = as designed).
+    set("--radius-scale", String((config.radius === undefined ? 100 : config.radius) / 100));
   }
 
   function applyHero(img, config) {

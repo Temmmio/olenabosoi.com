@@ -76,6 +76,8 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
    Text-only variant for links: .button-038.is--link inside a [data-hover] link,
    so hovering or focusing the whole link rolls the letters.
    ============================================ */
+/* Corners follow --radius-scale (tokens.css): Osmo's 2.5em pill times the scale. */
+:root { --button-038-border-radius: calc(2.5em * var(--radius-scale)); }
 :root {
   /* Larger than Osmo's 0.75em 1em: about 52px tall at body size. */
   --button-038-padding: 1.125em 1.75em;
@@ -1280,6 +1282,8 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
 
 /* Cards in 4:5, the crop of the photos (Osmo: 3:4). */
 .loading-screen__card { aspect-ratio: 4 / 5; }
+/* Corners follow --radius-scale (tokens.css), as Osmo's 0.5em times the scale. */
+.loading-screen__card { border-radius: calc(0.5em * var(--radius-scale)); }
 
 /* Phones: cards 20% smaller (Osmo: font-size max(1.5vw, 2em), so 2em here). */
 @media (max-width: 767px) {

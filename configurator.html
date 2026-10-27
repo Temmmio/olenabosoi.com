@@ -274,6 +274,11 @@
       </section>
 
       <section class="group">
+        <h2 class="group__title">Corners</h2>
+        <div class="range"><label for="radius">Rounding</label><input id="radius" type="range" min="0" max="200" step="5" data-radius><output data-radius-out></output></div>
+      </section>
+
+      <section class="group">
         <h2 class="group__title">Hero photo</h2>
         <div class="photos" data-photos></div>
         <input type="file" accept="image/*" hidden data-upload>
@@ -503,6 +508,11 @@
           edited();
         });
       });
+      // Corner rounding: 0-200% of the design, 100% in the middle.
+      $("[data-radius]").addEventListener("input", function (e) {
+        config.radius = Number(e.target.value);
+        edited();
+      });
       $("[data-overlay='on']").addEventListener("change", function (e) {
         config.overlay.on = e.target.checked;
         edited();
@@ -548,6 +558,10 @@
           input.value = config.hero.focus[i];
           $("[data-focus-out='" + i + "']").textContent = config.hero.focus[i] + "%";
         });
+
+        var radius = config.radius === undefined ? 100 : config.radius;
+        $("[data-radius]").value = radius;
+        $("[data-radius-out]").textContent = radius + "%";
 
         var o = config.overlay;
         $("[data-overlay='on']").checked = o.on;
@@ -615,7 +629,7 @@
             return data.basedOn && data.basedOn.indexOf(C.PRESETS[k].label) === 0;
           }).sort(function (a, b) { return C.PRESETS[b].label.length - C.PRESETS[a].label.length; })[0] || "main";
           var next = C.fromPreset(base);
-          ["bg", "fg", "accent", "accentText", "textMix", "eyebrowAccent", "heroEyebrowAccent"].forEach(function (k) {
+          ["bg", "fg", "accent", "accentText", "textMix", "eyebrowAccent", "heroEyebrowAccent", "radius"].forEach(function (k) {
             if (data[k] !== undefined) next[k] = data[k];
           });
           if (data.hero && C.HERO_IMAGES[data.hero.image]) next.hero = { image: data.hero.image, focus: data.hero.focus || C.HERO_IMAGES[data.hero.image].focus.slice() };

@@ -129,10 +129,13 @@
   --container-pad: clamp(1rem, 4vw, 3rem);
   --grid-gap: 1rem;
 
-  /* ---- Radius: small objects, cards, large blocks ---- */
-  --radius-sm: 0.5rem;
-  --radius-md: 1rem;
-  --radius-lg: 2rem;
+  /* ---- Radius: small objects, cards, large blocks ----
+     --radius-scale rounds every corner up or down together (the configurator's
+     slider; 1 = as designed). */
+  --radius-scale: 1;
+  --radius-sm: calc(0.5rem * var(--radius-scale));
+  --radius-md: calc(1rem * var(--radius-scale));
+  --radius-lg: calc(2rem * var(--radius-scale));
 
   /* ---- Motion ---- */
   --ease-osmo: cubic-bezier(0.625, 0.05, 0, 1);
