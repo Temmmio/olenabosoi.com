@@ -173,7 +173,7 @@
     }
     .photo.is--upload { display: grid; place-items: center; color: var(--c-muted); font-size: 1.25rem; }
     .photo.is--upload.has--image { color: transparent; }
-    .range { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr) 2.75rem; align-items: center; gap: 0.5rem; }
+    .range { display: grid; grid-template-columns: 6.25rem minmax(0, 1fr) 2.75rem; align-items: center; gap: 0.5rem; }
     .range output { text-align: right; color: var(--c-muted); font-variant-numeric: tabular-nums; }
     input[type="range"] { width: 100%; accent-color: var(--c-text); }
 
@@ -274,8 +274,8 @@
       </section>
 
       <section class="group">
-        <h2 class="group__title">Corners</h2>
-        <div class="range"><label for="radius">Rounding</label><input id="radius" type="range" min="0" max="200" step="5" data-radius><output data-radius-out></output></div>
+        <h2 class="group__title">Elements style</h2>
+        <div class="range"><label for="radius">Border radius</label><input id="radius" type="range" min="0" max="200" step="5" data-radius><output data-radius-out></output></div>
       </section>
 
       <section class="group">
