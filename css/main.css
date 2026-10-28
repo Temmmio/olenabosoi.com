@@ -1206,7 +1206,11 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
    ============================================ */
 /* Twice the section space on both sides, as above the globe and between
    sections elsewhere on the page. */
-.cta { padding-block: calc(var(--space-section) * 2); }
+.cta {
+  padding-top: calc(var(--space-section) * 2);
+  /* None below: the footer's top padding is the space before its line. */
+  padding-bottom: 0;
+}
 .cta__container {
   display: flex;
   flex-direction: column;
@@ -1231,6 +1235,9 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
    ============================================ */
 .footer {
   position: relative;
+  /* The space after the CTA, and room above the elastic line on the top
+     edge for it to bend into. */
+  padding-top: var(--space-section);
   /* Clips the letters while they sit below the page edge (see js/main.js). */
   overflow: clip;
 }
