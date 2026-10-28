@@ -31,7 +31,7 @@ sup { font-size: 0.5em; line-height: 0; vertical-align: super; }
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
   font-family: var(--font-heading);
-  font-weight: 500;
+  font-weight: 400;
   text-wrap: balance;
 }
 h1, .h1 { font-size: var(--fs-h1); line-height: var(--lh-tight); letter-spacing: -0.045em; }
@@ -130,6 +130,38 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
 
 .twostep-nav__toggle { border: 0; color: inherit; }
 .twostep-nav__toggle-bar { background-color: currentColor; }
+
+/* The theme switch, beside the menu button and as large. */
+.twostep-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.theme-toggle {
+  pointer-events: auto;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5em;
+  height: 2.5em;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  transition: background-color var(--duration-fast) ease;
+}
+.theme-toggle:hover { background-color: color-mix(in srgb, currentColor 10%, transparent); }
+.theme-toggle__icon {
+  width: 1.375em;
+  height: 1.375em;
+  transition: transform var(--duration-slow) var(--ease-osmo);
+}
+.theme-toggle:hover .theme-toggle__icon { transform: rotate(30deg); }
+.theme-toggle__icon.is--moon,
+[data-theme="light"] .theme-toggle__icon.is--sun { display: none; }
+[data-theme="light"] .theme-toggle__icon.is--moon { display: block; }
 .twostep-nav__top-line { display: none; } /* no divider under the bar when open */
 
 .twostep-nav__link-span,
@@ -138,7 +170,7 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
 /* The menu links are Heading 5 sized, with its line height and tracking. */
 .twostep-nav__link-span {
   font-size: var(--fs-h5);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.25;
   letter-spacing: -0.025em;
 }
@@ -199,7 +231,7 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
 /* The same type as the menu links (.twostep-nav__link-span). */
 .nav-card__title {
   font-size: var(--fs-h5);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.25;
   letter-spacing: -0.025em;
   text-wrap: balance;
@@ -229,6 +261,9 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
 /* One screen tall; everything visible sits in .hero__card. */
 .hero {
   position: relative;
+  /* Its own text colour: in the light theme the hero keeps the dark palette
+     (tokens.css), and the page's colour would otherwise come down from <body>. */
+  color: var(--text-1);
   height: 100svh;
   min-height: 36rem;
 }
@@ -332,6 +367,16 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   );
 }
 
+/* Light theme: both names fully opaque in the text colour (white on the
+   dark hero, near-black in the footer); the shimmer and hover still turn
+   the letters towards the accent as they swell. */
+[data-theme="light"] .hero__name,
+[data-theme="light"] .footer__name { color: var(--fg); }
+[data-theme="light"] .hero__name .char,
+[data-theme="light"] .footer__name .char {
+  color: color-mix(in srgb, var(--accent) calc(var(--wght-t) * 100%), var(--fg));
+}
+
 /* Phones: the hero name is fully white from the start, at any weight, so it
    reads clearly on the photo; the shimmer then only swells the letters. */
 @media screen and (max-width: 767px) {
@@ -351,11 +396,11 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   /* Muted, so the name sits back on the photo: a faint fill with a hairline edge. */
   color: color-mix(in srgb, var(--fg) 18%, transparent);
   /* Weight range of Variable Font Weight Hover (data-min / data-max on the h1). */
-  --wght-min: 200;
+  --wght-min: 100;
   --wght-max: 600;
   /* At rest the name is at its lightest (and so its faintest): that's the
      weight it rises with, is fitted to the width at, and settles back to. */
-  font-weight: 200;
+  font-weight: 100;
   letter-spacing: -0.06em;
   line-height: 1;
   text-wrap: nowrap;
@@ -446,10 +491,11 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   color: var(--text-1);
   border-radius: var(--radius-lg);
 }
-.cards-stack-card__number { color: var(--accent); }
+.cards-stack-card__number { color: var(--text-1); }
 .cards-stack-card__services-p { color: var(--text-3); }
 
-/* Services list: a check in the accent before each item, held to the first line. */
+/* Services list: a check before each item, in the item's own colour, held
+   to the first line. */
 .cards-stack-card__services-p {
   display: flex;
   align-items: flex-start;
@@ -460,7 +506,7 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   flex: none;
   width: 1em;
   height: calc(1em * var(--lh-base));
-  background-color: var(--accent-ui);
+  background-color: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5l3.25 3.25L13 5'/%3E%3C/svg%3E") center / 1em no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5l3.25 3.25L13 5'/%3E%3C/svg%3E") center / 1em no-repeat;
 }
@@ -737,9 +783,10 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
     height: 0.375rem;
     border-radius: 0.1875rem;
     background-color: color-mix(in srgb, var(--fg) 25%, transparent);
+    /* Osmo's ease over 1s, in step with the ring's bounce and ripples. */
     transition:
-      width var(--duration-fast) ease,
-      background-color var(--duration-fast) ease;
+      width 1s var(--ease-osmo),
+      background-color 1s var(--ease-osmo);
   }
   .work-combined__dot.is--active {
     width: 1.25rem;
@@ -904,7 +951,7 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   gap: var(--space-4);
   margin-bottom: auto;
 }
-.about__head .h3 { max-width: 13em; }
+.about__head .h2 { max-width: 13em; }
 
 .about__text {
   display: flex;
@@ -969,7 +1016,7 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
 /* Square logo plates in the site palette (Osmo's are round and light grey). */
 .logo-card {
   background-color: var(--surface-2);
-  border-radius: var(--radius-md);
+  border-radius: 50%; /* round plates, whatever the corner scale */
 }
 .logo-card__placeholder {
   font-size: var(--fs-body-sm);
@@ -995,6 +1042,19 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   mask-repeat: no-repeat;
   transition: background-color var(--duration-base) ease;
 }
+
+/* Rings that spread from a plate on hover (js/main.js initLogoPulse), as
+   the Work ring's ripples: a hairline in the text colour (half of it on
+   the light theme, where a dark line on white reads much stronger). */
+.logo-card__ripple {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--text-1);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+[data-theme="light"] .logo-card__ripple { border-color: color-mix(in srgb, var(--text-1) 50%, transparent); }
 
 /* Hover: the plate and its logo light up (and bounce, js/main.js initLogoPulse). */
 .logo-card { transition: background-color var(--duration-base) ease; }
@@ -1032,10 +1092,14 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   background-color: var(--card-1);
   border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
 }
+/* Light theme: no edge, the grey plates stand apart from the white page on
+   their own. Transparent rather than none, so the cards keep their size. */
+[data-theme="light"] .cards-stack-card,
+[data-theme="light"] .process-card { border-color: transparent; }
 .cards-stack__item:nth-child(even) > .cards-stack-card,
 .cards-stack__item:nth-child(even) > .process-card { background-color: var(--card-2); }
 
-.process-card__number { color: var(--accent); }
+.process-card__number { color: var(--text-1); }
 
 /* Top row of the Services and Process cards: the number on the left, a
    thinking orb (js/orbs.js) on the right, in the accent colour. */
@@ -1160,8 +1224,9 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
 }
 
 /* ============================================
-   Footer — a card on the navigation bar's blurred surface, over a large
-   "Olena Bosoi" set like the hero name. The name's top runs under the card.
+   Footer — open on the page, between two elastic lines (its top edge and
+   above the copyright), over a large "Olena Bosoi" set like the hero name,
+   with air between them.
    ============================================ */
 .footer {
   position: relative;
@@ -1175,11 +1240,6 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-card);
-  border-radius: var(--radius-lg);
-  background-color: var(--surface-blur);
-  -webkit-backdrop-filter: blur(var(--blur));
-  backdrop-filter: blur(var(--blur));
 }
 
 .footer__grid {
@@ -1239,19 +1299,25 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   color: color-mix(in srgb, currentColor 15%, transparent);
 }
 
+/* The same columns as the grid above, so the credit starts in line with
+   Quick links. */
 .footer__bottom {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-8);
-  font-size: var(--fs-body-sm);
   color: var(--text-3);
 }
+.footer__bottom > :last-child { grid-column: 2 / -1; }
+/* The credit link sits in a line of text: as tall as that line (Button 038
+   sets line-height 1) and lined up with its top, not its baseline (the grid's
+   baseline is its empty background layer's bottom edge, which lifted the
+   word and the line). Its letters then sit on the text's own baseline. */
+.footer__bottom .footer__link { display: inline; }
+.footer__bottom .button-038 { line-height: inherit; vertical-align: top; }
 
-/* The name sits on the page's bottom edge; its top 40% (of the letter height)
-   runs under the card. */
+/* The name sits on the page's bottom edge, clear below the links. */
 .footer__name-wrap { display: flex; justify-content: center; }
-.footer__name { margin-top: -0.3em; }
-/* Phones: the name sits clear below the card instead of running under it. */
+.footer__name { margin-top: var(--space-16); }
 @media (max-width: 767px) {
   .footer__name { margin-top: var(--space-8); }
 }
@@ -1261,6 +1327,7 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .footer__col.is--brand { grid-column: 1 / -1; }
   .footer__bottom { grid-template-columns: minmax(0, 1fr); }
+  .footer__bottom > :last-child { grid-column: auto; }
   .footer__bottom { gap: var(--space-2); }
 }
 
@@ -1323,27 +1390,24 @@ html.is-intro [data-hero-content],
 html.is-intro [data-hero-name],
 html.is-intro [data-intro-nav] { visibility: hidden; }
 
-/* Cursor (Osmo Basic Custom Cursor): the text colour instead of Osmo's
-   orange, and above everything, the banner zoom and loader included. Over
-   links and banners it grows to 4em (Osmo: 3em). */
+/* Cursor (Osmo Basic Custom Cursor): white in the "difference" blend mode,
+   so it shows as the inverse of whatever is under it, on the light and dark
+   themes, photos and buttons alike; above everything, the banner zoom and
+   loader included. Over links and banners it grows to 4em (Osmo: 3em) into an
+   empty ring, the outline alone. */
 .cursor {
   z-index: 300;
-  background-color: var(--accent-ui);
-  border-color: var(--accent-ui);
+  background-color: #ffffff;
+  border-color: #ffffff;
+  mix-blend-mode: difference;
 }
 body:has( a:hover) .cursor,
 body:has( button:hover) .cursor,
-body:has( [data-cursor]:hover) .cursor {
-  width: 4em;
-  height: 4em;
-  background-color: color-mix(in srgb, var(--accent-ui) 20%, transparent);
-}
-/* The banners open in the lightbox (Click to Zoom), so they take the
-   cursor's hover state too, the same as links. */
+body:has( [data-cursor]:hover) .cursor,
 body:has( [data-click-zoom]:hover) .cursor {
   width: 4em;
   height: 4em;
-  background-color: color-mix(in srgb, var(--accent-ui) 20%, transparent);
+  background-color: transparent;
 }
 
 /* Phones: the hero's "Olena Bosoi" has no shimmer (js/main.js) and sits at

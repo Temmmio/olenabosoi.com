@@ -4,7 +4,8 @@
 // right even when the page loads with that block already pinned; a colour
 // attribute may name a CSS variable ("--accent"), read from the heading; and
 // with no start colour given, the letters start as the heading's own colour
-// at 20% (Osmo: always white at 20%).
+// at 20% (Osmo: always white at 20%); the colours are read again when the
+// theme switch fires "themechange" (js/main.js).
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 function initGradientWaveText() {
@@ -13,17 +14,22 @@ function initGradientWaveText() {
     const scrollEnd = heading.getAttribute('data-gradient-wave-scroll-end') || 'center 40%';
     // Site change: "--name" reads that CSS variable (see the note at the top).
     const cssColor = (value) => value && value.startsWith('--') ? getComputedStyle(heading).getPropertyValue(value).trim() : value;
-    const waveColor = cssColor(heading.getAttribute('data-gradient-wave-color-wave')) || '#F84131';
     const waveDuration = parseFloat(heading.getAttribute('data-gradient-wave-duration')) || 0.4;
     const scrubValue = parseFloat(heading.getAttribute('data-gradient-wave-scrub')) || 0.1;
-    const endColor = getComputedStyle(heading).color;
     // Site change: the default start colour follows the heading's colour.
     const faint = (color) => {
       const [r, g, b] = color.match(/[\d.]+/g).map(Number);
       const scale = color.startsWith('color(') ? 255 : 1;
       return `rgba(${r * scale}, ${g * scale}, ${b * scale}, 0.2)`;
     };
-    const startColor = cssColor(heading.getAttribute('data-gradient-wave-color-start')) || faint(endColor);
+    // Site change: read again on "themechange" (see the note at the top).
+    let waveColor, endColor, startColor;
+    const readColors = () => {
+      waveColor = cssColor(heading.getAttribute('data-gradient-wave-color-wave')) || '#F84131';
+      endColor = getComputedStyle(heading).color;
+      startColor = cssColor(heading.getAttribute('data-gradient-wave-color-start')) || faint(endColor);
+    };
+    readColors();
 
     new SplitText(heading, {
       type: 'words, chars',
@@ -45,6 +51,12 @@ function initGradientWaveText() {
             else activeChars.delete(char);
           });
         };
+
+        // Site change: a theme switch recolours the letters where they stand.
+        window.addEventListener('themechange', () => {
+          readColors();
+          syncChars();
+        });
 
         const ctx = gsap.context(() => {
           gsap.set(chars, {color: startColor});

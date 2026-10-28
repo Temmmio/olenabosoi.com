@@ -1,6 +1,9 @@
 // Osmo resource from the Osmo library (Click to Zoom (Basic)).
-// One site change, marked below: the zoom keeps the image's own proportions,
-// since the banners it opens from can be rotated and scaled by the Work animation.
+// Site changes, marked below: the zoom keeps the image's own proportions,
+// since the banners it opens from can be rotated and scaled by the Work animation;
+// the backdrop colour is read on every open, so it follows the theme switch;
+// and it fades to the same colour, clear, not to clear black (which showed
+// as a dark flash over the light theme's white backdrop).
 function initClickToZoomBasic() {
 
   const CONFIG = {
@@ -22,8 +25,14 @@ function initClickToZoomBasic() {
   lightbox.setAttribute("aria-hidden", "true");
 
   // Backdrop animates from transparent to the CSS-declared color.
-  const backdropColor = window.getComputedStyle(lightbox).backgroundColor;
-  const transparent = "rgba(0, 0, 0, 0)";
+  // Site change: the colour as rgba, and the same colour fully clear.
+  const rgbaOf = (color, alpha) => {
+    const [r, g, b, a = 1] = color.match(/[\d.]+/g).map(Number);
+    const k = color.startsWith("color(") ? 255 : 1;
+    return `rgba(${Math.round(r * k)}, ${Math.round(g * k)}, ${Math.round(b * k)}, ${alpha ?? a})`;
+  };
+  let backdropColor = rgbaOf(window.getComputedStyle(lightbox).backgroundColor);
+  let transparent = rgbaOf(backdropColor, 0);
 
   let cloneEl = null;
   let isOpen = false;
@@ -61,6 +70,10 @@ function initClickToZoomBasic() {
 
     const srcComputed = window.getComputedStyle(img);
 
+    // Site change: the CSS colour of the current theme.
+    lightbox.style.backgroundColor = "";
+    backdropColor = rgbaOf(window.getComputedStyle(lightbox).backgroundColor);
+    transparent = rgbaOf(backdropColor, 0);
     gsap.set(lightbox, { display: "flex", backgroundColor: transparent });
 
     const lightboxStyle = window.getComputedStyle(lightbox);

@@ -32,9 +32,35 @@
   --bg: #000000;          /* the page ground */
   --fg: #ffffff;          /* the text */
   --accent: #ffffff;      /* buttons, the headings' colour wave, the name
-                             shimmer's peak, the Work ring and the cursor */
+                             shimmer's peak and the Work ring */
   --accent-text: #000000; /* text on the accent (button labels) */
+  color-scheme: dark;
+}
 
+/* Light theme: the switch in the menu bar (js/main.js) sets data-theme="light"
+   on <html>. Dark stays the default. Pure white ground and near-black text,
+   oklch(0.145 0 0), in hex for the colour wave. */
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+  --accent: #0a0a0a;
+  --accent-text: #ffffff;
+  color-scheme: light;
+}
+
+/* The hero stays dark in both themes: it is a photo with light type on it. */
+:root[data-theme="light"] .hero {
+  --bg: #000000;
+  --fg: #ffffff;
+  --accent: #ffffff;
+  --accent-text: #000000;
+  color-scheme: dark;
+}
+
+/* Every other colour, mixed from the four. Declared on the hero too, so in
+   the light theme they are mixed again from its dark four. */
+:root,
+:root[data-theme="light"] .hero {
   --text-1: var(--fg);
   --text-2: color-mix(in srgb, var(--fg) 70%, var(--bg));
   --text-3: color-mix(in srgb, var(--fg) 60%, var(--bg));
@@ -51,7 +77,7 @@
 
   --accent-hover: color-mix(in srgb, var(--accent) 85%, var(--accent-text));
   /* Accent for small moving details: the Work ring's line, its active dot,
-     flash and ripples, the card orbs and the cursor. */
+     flash and ripples, and the card orbs. */
   --accent-ui: var(--accent);
   /* Services and Process cards: two quiet tones, alternating card by card. */
   --card-1: color-mix(in srgb, var(--fg) 5%, var(--bg));
@@ -77,6 +103,35 @@
      A little lighter than the menu bar on monologue.framer.website (24% at
      40%), so it shows in bright light. */
   --surface-blur: color-mix(in srgb, color-mix(in srgb, var(--fg) 30%, var(--bg)) 50%, transparent);
+}
+
+/* Light theme greys, set in OKLCH rather than mixed: black mixed into white
+   in sRGB darkens too fast, so the cards and lines came out heavy. Steps of
+   lightness, no hue, as the dark theme. */
+:root[data-theme="light"] {
+  --text-2: oklch(0.4 0 0);
+  --text-3: oklch(0.5 0 0);
+  --text-4: oklch(0.8 0 0);
+  /* Eyebrows in the text colour itself, not a lighter grey. */
+  --text-eyebrow: var(--text-1);
+
+  --surface-1: oklch(0.965 0 0);
+  --surface-2: oklch(0.94 0 0);
+  --surface-3: oklch(0.91 0 0);
+
+  --line-soft: oklch(0.94 0 0);
+  --line: oklch(0.9 0 0);
+  --line-strong: oklch(0.8 0 0);
+
+  --card-1: oklch(0.975 0 0);
+  --card-2: oklch(0.955 0 0);
+
+  /* Frosted light glass: shows on the white page, and stays light (not a
+     muddy grey) when the open menu sits over the dark hero. */
+  --surface-blur: oklch(0.955 0 0 / 0.85);
+}
+
+:root {
   --blur: 30px;
 
   /* ---- Typography: ZT Nature throughout, ZT Bros Oskon for eyebrows ---- */
@@ -143,6 +198,4 @@
   --duration-fast: 250ms;
   --duration-base: 400ms;
   --duration-slow: 625ms;
-
-  color-scheme: dark;
 }

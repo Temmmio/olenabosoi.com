@@ -14,6 +14,32 @@ import { MODE_FRAMES, paintFrame, resolvePreset } from "https://cdn.jsdelivr.net
 const size = 64; // the package's main preset, in CSS px
 const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// The engine shades each dot from the accent towards black by its "white"
+// value (0 = the accent itself), so on a dark card the far dots sink into it.
+// On a light card that reads as a dark smudge, and its light mode shades
+// towards white, paler than the accent. So the light theme (js/main.js)
+// paints the same frame itself: every dot in the accent, its shade turned
+// into transparency instead, which over a dark card is what the engine draws.
+const isLight = () => document.documentElement.dataset.theme === "light";
+const accentInk = (tint, shade, alpha) =>
+  `rgba(${tint.r},${tint.g},${tint.b},${alpha * (1 - Math.min(1, Math.max(0, shade)))})`;
+function paintLight(ctx, frame, tint) {
+  for (const l of frame.lines) {
+    ctx.strokeStyle = accentInk(tint, l.white, l.a ?? 1);
+    ctx.lineWidth = l.w;
+    ctx.beginPath();
+    ctx.moveTo(l.x1, l.y1);
+    ctx.lineTo(l.x2, l.y2);
+    ctx.stroke();
+  }
+  for (const d of frame.dots) {
+    ctx.fillStyle = accentInk(tint, d.white, d.a ?? 1);
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
 // The accent colour as the engine's tint: { r, g, b }, 0–255.
 const tintOf = (canvas) => {
   const [r, g, b] = getComputedStyle(canvas).color.match(/[\d.]+/g).map(Number);
@@ -31,12 +57,19 @@ function initOrb(canvas) {
   canvas.width = Math.round(size * ratio);
   canvas.height = Math.round(size * ratio);
   const ctx = canvas.getContext("2d");
-  const tint = tintOf(canvas);
+  let tint = tintOf(canvas);
+  // The theme switch (js/main.js) changes the accent.
+  window.addEventListener("themechange", () => {
+    tint = tintOf(canvas);
+    if (reduced || !running) draw(reduced ? 0.6 : (performance.now() / 1000) * speed);
+  });
 
   const draw = (seconds) => {
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     ctx.clearRect(0, 0, size, size);
-    paintFrame(ctx, frameFn(size, seconds, opts), true, tint);
+    const frame = frameFn(size, seconds, opts);
+    if (isLight()) paintLight(ctx, frame, tint);
+    else paintFrame(ctx, frame, true, tint);
   };
 
   if (reduced) {

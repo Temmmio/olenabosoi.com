@@ -52,14 +52,14 @@ const touchShimmerPause = 2;
 // Phones: the hero's "Olena Bosoi" sits at the headings' weight (main.css)
 // with no shimmer; the footer one shimmers as everywhere else.
 const phoneName = window.matchMedia("(max-width: 767px)");
-const nameWeights = (name) => ({ min: parseFloat(name.dataset.min) || 200, max: parseFloat(name.dataset.max) || 600 });
+const nameWeights = (name) => ({ min: parseFloat(name.dataset.min) || 100, max: parseFloat(name.dataset.max) || 600 });
 const noShimmer = (name) => phoneName.matches && name.hasAttribute("data-hero-name");
 
 // After "Olena Bosoi" rises (hero intro, hero return, footer) it rests at its
 // lightest weight. A shimmer then runs through it: a virtual cursor sweeps left
 // to right and the letters swell and fade as it passes, with the same range and
-// weights as the hover. After that the weight hover takes over, from the next
-// real cursor move; touch screens repeat the shimmer instead. stillShown() guards against the name having been hidden again.
+// weights as the hover. After that the weight hover takes over, easing in
+// (js/osmo/variable-font-weight-hover.js); touch screens repeat the shimmer instead. stillShown() guards against the name having been hidden again.
 function shimmerName(name, chars, stillShown = () => true) {
   if (noShimmer(name)) return null;
   const { min, max } = nameWeights(name);
@@ -78,9 +78,26 @@ function shimmerName(name, chars, stillShown = () => true) {
   name.setAttribute("data-font-weight-hover-paused", "");
   gsap.getTweensOf(chars).forEach((tween) => "--wght" in tween.vars && tween.pause());
 
+  // Hands over to the weight hover. On a pointer screen that happens as soon
+  // as the wave's peak passes the last letter: the osmo ease slows right down
+  // for the wave's tail, which read as a pause before the hover came in. The
+  // hover then carries the wave on from there, gliding back to the cursor.
+  // Same tests as the Osmo weight hover's, which doesn't run otherwise.
+  const touch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  const hover = !touch && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lastCenter = centers[centers.length - 1];
+  const finish = () => {
+    if (!stillShown()) return;
+    name.removeAttribute("data-font-weight-hover-paused");
+    // Touch screens have no weight hover to take over, so the shimmer comes
+    // back every couple of seconds instead, for as long as the name is shown
+    // (restName stops it).
+    if (touch) shimmerNameAfter(touchShimmerPause, name, chars, stillShown);
+  };
+
   name._shimmer?.kill();
   name._shimmer = gsap.to(sweep, {
-    x: centers[centers.length - 1] + range,
+    x: lastCenter + range,
     duration: 3.1,
     ease: "osmo",
     onUpdate: () => {
@@ -89,17 +106,16 @@ function shimmerName(name, chars, stillShown = () => true) {
         const weight = distance >= range ? min : min + (max - min) * (1 - distance / range);
         char.style.setProperty("--wght", weight);
       });
+      if (hover && sweep.x >= lastCenter) {
+        name._shimmer.kill();
+        // The weight hover glides on from here (page x, as it measures).
+        name.fontWeightHoverGlide = { x: sweep.x + window.scrollX, range };
+        finish();
+      }
     },
     onComplete: () => {
       chars.forEach((char) => char.style.setProperty("--wght", min));
-      if (!stillShown()) return;
-      name.removeAttribute("data-font-weight-hover-paused");
-      // Touch screens have no weight hover to take over, so the shimmer comes
-      // back every couple of seconds instead, for as long as the name is shown
-      // (restName stops it). Same test as the Osmo weight hover's.
-      if (window.matchMedia("(hover: none), (pointer: coarse)").matches) {
-        shimmerNameAfter(touchShimmerPause, name, chars, stillShown);
-      }
+      finish();
     },
   });
   return name._shimmer;
@@ -323,15 +339,7 @@ function initWorkRunners() {
       if (percent) percent.textContent = Math.round(progress * 100) + "%";
       if (progress >= 0.995 && !full) {
         full = true;
-        bounce();
-        gsap.fromTo(ripples, { scale: 1, opacity: 0.6 }, {
-          scale: (index) => 2 + index * 0.75,
-          opacity: 0,
-          duration: 2,
-          ease: "power2.out",
-          stagger: 0.18,
-          overwrite: true,
-        });
+        bounceWithRipples();
       } else if (progress < 0.98) {
         full = false;
       }
@@ -355,7 +363,7 @@ function initWorkRunners() {
       },
     }));
     // The ring's bounce: the ring, disc and all, with a brief flash of the
-    // disc: it fills to 50% accent over its blurred surface, and fades back.
+    // disc: a faint 12% of accent over its blurred surface, and back.
     // The ring line flashes from the text colour to the accent and fades back,
     // timed as the elastic lines' flash.
     const bounce = () => {
@@ -368,9 +376,21 @@ function initWorkRunners() {
       // Eased in and out both ways: it brightens softly, then fades softly.
       if (ringDisc) {
         gsap.timeline()
-          .fromTo(ringDisc, { "--disc-light": "0%" }, { "--disc-light": "50%", duration: 0.4, ease: "sine.inOut", overwrite: "auto" })
+          .fromTo(ringDisc, { "--disc-light": "0%" }, { "--disc-light": "12%", duration: 0.4, ease: "sine.inOut", overwrite: "auto" })
           .to(ringDisc, { "--disc-light": "0%", duration: 0.8, ease: "sine.inOut" });
       }
+    };
+    // The bounce with ripples, as when the ring fills up and at each switch.
+    const bounceWithRipples = () => {
+      bounce();
+      gsap.fromTo(ripples, { scale: 1, opacity: 0.25 }, {
+        scale: (index) => 2 + index * 0.75,
+        opacity: 0,
+        duration: 2,
+        ease: "power2.out",
+        stagger: 0.18,
+        overwrite: true,
+      });
     };
     const show = (next) => {
       if (next === current) return;
@@ -383,8 +403,8 @@ function initWorkRunners() {
       };
       swap(titleLines);
       dots.forEach((dot, index) => dot.classList.toggle("is--active", index === next));
-      // The ring bounces at each switch, as when it lands.
-      bounce();
+      // Each switch: the same bounce and ripples as when the ring fills up.
+      bounceWithRipples();
       current = next;
     };
     const batchAt = (scrolled) => {
@@ -595,8 +615,8 @@ function initWorkMore() {
     // The centre column's top banner starts on the grid's centre at nearly
     // twice its size; every other one starts hidden behind it, pulled in
     // towards the centre (sideways all the way, up and down most of it), small
-    // (the further out, the smaller) and clear. Then they all open out
-    // together, fading in, as it shrinks into its place.
+    // (the further out, the smaller). Then they all open out together as it
+    // shrinks into its place. No fade: they stay fully opaque all the way.
     const half = gridBox.width / 2;
     const gridMiddle = gridBox.left + half;
     const gridCentreY = gridBox.top + gridBox.height / 2;
@@ -605,12 +625,11 @@ function initWorkMore() {
       const hero = far < 0.1 && !card.previousElementSibling;
       if (hero) gsap.set(card, { zIndex: 2 });
       return hero
-        ? { x: 0, y: gridCentreY - inGrid[i].y, scale: 1.8, opacity: 1 }
+        ? { x: 0, y: gridCentreY - inGrid[i].y, scale: 1.8 }
         : {
             x: (gridMiddle - inGrid[i].x) * 0.95,
             y: (gridCentreY - inGrid[i].y) * 0.75,
             scale: 0.7 - far * 0.2,
-            opacity: 0,
           };
     });
 
@@ -659,13 +678,11 @@ function initWorkMore() {
         x: (i) => scattered[i].x,
         y: (i) => scattered[i].y,
         scale: (i) => scattered[i].scale,
-        opacity: (i) => scattered[i].opacity,
       },
       {
         x: 0,
         y: 0,
         scale: 1,
-        opacity: 1,
         ease: "power2.inOut",
         duration: settleLength * 0.8,
       }
@@ -782,7 +799,13 @@ function initAboutPhotoDrop() {
 
 function initPageIntro() {
   const root = document.documentElement;
-  if (!root.classList.contains("is-intro")) return;
+  // The hero name's weight hover starts paused (index.html) and waits for the
+  // intro's shimmer; with no intro it starts now, easing in.
+  const releaseName = () => document.querySelector("[data-hero-name]")?.removeAttribute("data-font-weight-hover-paused");
+  if (!root.classList.contains("is-intro")) {
+    releaseName();
+    return;
+  }
 
   const hero = document.querySelector("[data-hero]");
   const loader = document.querySelector("[data-loading-container]");
@@ -790,6 +813,7 @@ function initPageIntro() {
   // The browser may have restored a scroll position after all.
   if (!hero || !loader || window.scrollY > 0) {
     root.classList.remove("is-intro", "is-loading");
+    releaseName();
     return;
   }
 
@@ -928,11 +952,78 @@ function initLogoPulse() {
           overwrite: "auto",
         })
         .to(card, { scaleX: 1, scaleY: 1, duration: 1, ease: "elastic.out(1, 0.3)" });
+      // And rings spread out from it, fading, as from the Work ring when it
+      // fills: the same three, start and timing, smaller (the plates sit
+      // close together). Made on the first hover.
+      if (!card._ripples) {
+        card._ripples = [0, 1, 2].map(() => {
+          const ripple = document.createElement("span");
+          ripple.className = "logo-card__ripple";
+          ripple.setAttribute("aria-hidden", "true");
+          card.appendChild(ripple);
+          return ripple;
+        });
+      }
+      // Each ring shows only once it starts to spread (immediateRender off),
+      // so the ones still waiting don't sit on the plate as an outline.
+      gsap.fromTo(card._ripples, { scale: 1, opacity: 0.25 }, {
+        scale: (index) => 1.4 + index * 0.3,
+        opacity: 0,
+        duration: 2,
+        ease: "power2.out",
+        stagger: 0.18,
+        overwrite: true,
+        immediateRender: false,
+      });
     });
   });
 }
 
+// Light / dark switch in the menu bar. Dark is the default; the choice is
+// kept in localStorage and set on <html> before first paint (the <head>
+// script). The scripts that read colours once (the headings' wave, the card
+// orbs) listen for "themechange" and read them again. The swap cross-fades
+// where the browser has view transitions, and the menu bar bounces (pulse,
+// as the Work ring) while the new icon springs round into place; so does
+// the hero's name when it is on screen, squashing on its bottom edge.
+function initThemeToggle() {
+  const root = document.documentElement;
+  const button = document.querySelector("[data-theme-toggle]");
+  if (!button) return;
+  const label = () => {
+    const light = root.dataset.theme === "light";
+    button.setAttribute("aria-label", light ? "Switch to dark theme" : "Switch to light theme");
+  };
+  const apply = (light) => {
+    if (light) root.dataset.theme = "light";
+    else delete root.dataset.theme;
+    try { localStorage.setItem("ob-theme", light ? "light" : "dark"); } catch (e) {}
+    label();
+    window.dispatchEvent(new Event("themechange"));
+  };
+  label();
+  button.addEventListener("click", () => {
+    const light = root.dataset.theme !== "light";
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (document.startViewTransition && !reduce) document.startViewTransition(() => apply(light));
+    else apply(light);
+    if (reduce) return;
+    pulse(document.querySelector(".twostep-nav__bar"));
+    const name = document.querySelector("[data-hero-name]");
+    const nameWrap = name && name.parentElement;
+    if (nameWrap && !name.hasAttribute("data-hero-name-hidden") && nameWrap.getBoundingClientRect().bottom > 0) {
+      gsap.set(nameWrap, { transformOrigin: "50% 100%" });
+      pulse(nameWrap);
+    }
+    gsap.fromTo(button.querySelector(light ? ".is--moon" : ".is--sun"),
+      // The CSS hover turn is off while it runs, then handed back.
+      { rotation: -120, scale: 0.6, transition: "none" },
+      { rotation: 0, scale: 1, duration: 1, ease: "elastic.out(1, 0.4)", overwrite: true, clearProps: "transform,transition" });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  initThemeToggle();
   initLenis();
   initScrollMemory();
   initPageIntro();
