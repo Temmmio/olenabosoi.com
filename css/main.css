@@ -377,12 +377,13 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   color: color-mix(in srgb, var(--accent) calc(var(--wght-t) * 100%), var(--fg));
 }
 
-/* Phones: the hero name is fully white from the start, at any weight, so it
-   reads clearly on the photo; the shimmer then only swells the letters. */
+/* Phones, dark theme: no cursor or shimmer to bring the hero name up, so it
+   rests at the hero eyebrows' see-through white (60%), not the faint 18%. */
 @media screen and (max-width: 767px) {
-  /* .hero in front: above the muted colour set further down. */
-  .hero .hero__name,
-  .hero .hero__name .char { color: var(--fg); }
+  :root:not([data-theme="light"]) .hero .hero__name,
+  :root:not([data-theme="light"]) .hero .hero__name .char {
+    color: color-mix(in srgb, var(--fg) 60%, transparent);
+  }
 }
 
 /* Flex, not block: a block would give the inline-block name a line box with
@@ -1416,8 +1417,8 @@ body:has( [data-click-zoom]:hover) .cursor {
    usual range and shimmer. */
 @media screen and (max-width: 767px) {
   .hero .hero__name {
-    --wght-min: 500;
-    font-weight: 500;
+    --wght-min: 400;
+    font-weight: 400;
   }
 }
 
