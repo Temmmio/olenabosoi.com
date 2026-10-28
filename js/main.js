@@ -425,8 +425,9 @@ function initWorkRunners() {
         setProgress(self.progress);
         show(batchAt(self.progress * total()));
       },
-      // The ring lands with a bounce as the block pins and starts filling.
-      onEnter: bounce,
+      // The ring lands as the block pins and starts filling: the square has
+      // just closed into the disc, so it bounces with ripples, as when full.
+      onEnter: bounceWithRipples,
     });
 
     // One row per batch, each scrubbed over its own stretch of the pin.
@@ -979,8 +980,9 @@ function initLogoPulse() {
   });
 }
 
-// Light / dark switch in the menu bar. Dark is the default; the choice is
-// kept in localStorage and set on <html> before first paint (the <head>
+// Light / dark switch in the menu bar. Until it is used the page follows the
+// system's theme, also when that changes; once used, the choice is kept in
+// localStorage. Either is set on <html> before first paint (the <head>
 // script). The scripts that read colours once (the headings' wave, the card
 // orbs) listen for "themechange" and read them again. The swap cross-fades
 // where the browser has view transitions, and the menu bar bounces (pulse,
@@ -994,14 +996,18 @@ function initThemeToggle() {
     const light = root.dataset.theme === "light";
     button.setAttribute("aria-label", light ? "Switch to dark theme" : "Switch to light theme");
   };
-  const apply = (light) => {
+  const apply = (light, remember = true) => {
     if (light) root.dataset.theme = "light";
     else delete root.dataset.theme;
-    try { localStorage.setItem("ob-theme", light ? "light" : "dark"); } catch (e) {}
+    if (remember) try { localStorage.setItem("ob-theme", light ? "light" : "dark"); } catch (e) {}
     label();
     window.dispatchEvent(new Event("themechange"));
   };
   label();
+  const picked = () => { try { return localStorage.getItem("ob-theme"); } catch (e) { return null; } };
+  window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (event) => {
+    if (!picked()) apply(event.matches, false);
+  });
   button.addEventListener("click", () => {
     const light = root.dataset.theme !== "light";
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

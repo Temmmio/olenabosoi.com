@@ -30,7 +30,7 @@ function initVariableFontWeightHover() {
   const resumeMs = 700;
   // The glide eases out of the wave's end and slows right down as it
   // reaches the cursor (expo.inOut), over a longer stretch.
-  const glideMs = 1400;
+  const glideMs = 2000;
   let glideEase;
   let osmoEase;
   const resumeEase = (t) => (osmoEase = osmoEase || gsap.parseEase("osmo") || gsap.parseEase("power2.inOut"))(t);

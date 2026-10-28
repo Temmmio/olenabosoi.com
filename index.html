@@ -36,8 +36,11 @@
         window.restoreScrollY = savedY;
       }
       var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      // The theme picked with the switch in the menu bar (js/main.js); dark by default.
-      try { if (localStorage.getItem("ob-theme") === "light") root.dataset.theme = "light"; } catch (e) {}
+      // The theme picked with the switch in the menu bar (js/main.js); until
+      // one is picked, the system's (dark when it has none).
+      var theme = null;
+      try { theme = localStorage.getItem("ob-theme"); } catch (e) {}
+      if (theme === "light" || (!theme && window.matchMedia("(prefers-color-scheme: light)").matches)) root.dataset.theme = "light";
       if (location.hash || restoresScroll || reduceMotion) return;
       root.classList.add("is-intro", "is-loading");
       // Failsafe: never leave the page hidden if the scripts don't arrive.
