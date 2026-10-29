@@ -46,9 +46,6 @@ function restoreScroll() {
   ScrollTrigger.update();
 }
 
-// Seconds between shimmers on touch screens (see shimmerName).
-const touchShimmerPause = 2;
-
 // Phones: the hero's "Olena Bosoi" sits at the headings' weight (main.css)
 // with no shimmer; the footer one shimmers as everywhere else.
 const phoneName = window.matchMedia("(max-width: 767px)");
@@ -59,18 +56,30 @@ const noShimmer = (name) => phoneName.matches && name.hasAttribute("data-hero-na
 // lightest weight. A shimmer then runs through it: a virtual cursor sweeps left
 // to right and the letters swell and fade as it passes, with the same range and
 // weights as the hover. After that the weight hover takes over, easing in
-// (js/osmo/variable-font-weight-hover.js); touch screens repeat the shimmer instead. stillShown() guards against the name having been hidden again.
+// (js/osmo/variable-font-weight-hover.js); touch screens keep the shimmer
+// sweeping back and forth from letter to letter instead. stillShown() guards against the name having been hidden again.
 function shimmerName(name, chars, stillShown = () => true) {
   if (noShimmer(name)) return null;
   const { min, max } = nameWeights(name);
-  // A wider wave than the hover's (1.6x): more letters lit at once, so the sweep
-  // reads as one smooth pass, not letter by letter.
-  const range = (parseFloat(name.dataset.range) || 300) * 1.6;
   const centers = chars.map((char) => {
     const box = char.getBoundingClientRect();
     return box.left + box.width / 2;
   });
+  const touch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  const lastCenter = centers[centers.length - 1];
+  // A wider wave than the hover's (1.6x): more letters lit at once, so the sweep
+  // reads as one smooth pass, not letter by letter. On touch screens, where
+  // the name spans the phone, that would light it all at once: there the wave
+  // is about two and a half letters wide, so it visibly runs letter by letter.
+  const range = touch
+    ? 2.5 * (lastCenter - centers[0]) / Math.max(1, centers.length - 1)
+    : (parseFloat(name.dataset.range) || 300) * 1.6;
   const sweep = { x: centers[0] - range };
+  const paint = () => chars.forEach((char, index) => {
+    const distance = Math.abs(sweep.x - centers[index]);
+    const weight = distance >= range ? min : min + (max - min) * (1 - distance / range);
+    char.style.setProperty("--wght", weight);
+  });
 
   // The cursor effect is off for the whole shimmer: paused, and any weight
   // tween it still has running is paused too (not killed: the hover reuses
@@ -83,29 +92,29 @@ function shimmerName(name, chars, stillShown = () => true) {
   // for the wave's tail, which read as a pause before the hover came in. The
   // hover then carries the wave on from there, gliding back to the cursor.
   // Same tests as the Osmo weight hover's, which doesn't run otherwise.
-  const touch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
   const hover = !touch && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const lastCenter = centers[centers.length - 1];
   const finish = () => {
     if (!stillShown()) return;
     name.removeAttribute("data-font-weight-hover-paused");
-    // Touch screens have no weight hover to take over, so the shimmer comes
-    // back every couple of seconds instead, for as long as the name is shown
-    // (restName stops it).
-    if (touch) shimmerNameAfter(touchShimmerPause, name, chars, stillShown);
   };
 
   name._shimmer?.kill();
+  // Touch screens have no weight hover to take over, so the wave comes in,
+  // stops on the last letter (bold), and from then on runs slowly back and
+  // forth between the first and last letters, never leaving the name, for
+  // as long as it is shown (restName stops it).
+  if (touch) {
+    name._shimmer = gsap.timeline({ onUpdate: paint })
+      .to(sweep, { x: lastCenter, duration: 4, ease: "sine.inOut" })
+      .to(sweep, { x: centers[0], duration: 6, ease: "sine.inOut", repeat: -1, yoyo: true });
+    return name._shimmer;
+  }
   name._shimmer = gsap.to(sweep, {
     x: lastCenter + range,
     duration: 3.1,
     ease: "osmo",
     onUpdate: () => {
-      chars.forEach((char, index) => {
-        const distance = Math.abs(sweep.x - centers[index]);
-        const weight = distance >= range ? min : min + (max - min) * (1 - distance / range);
-        char.style.setProperty("--wght", weight);
-      });
+      paint();
       if (hover && sweep.x >= lastCenter) {
         name._shimmer.kill();
         // The weight hover glides on from here (page x, as it measures).
@@ -380,7 +389,7 @@ function initWorkRunners() {
           .to(ringDisc, { "--disc-light": "0%", duration: 0.8, ease: "sine.inOut" });
       }
     };
-    // The bounce with ripples, as when the ring fills up and at each switch.
+    // The bounce with ripples: as the ring lands and starts filling, and when full.
     const bounceWithRipples = () => {
       bounce();
       gsap.fromTo(ripples, { scale: 1, opacity: 0.25 }, {
@@ -403,8 +412,9 @@ function initWorkRunners() {
       };
       swap(titleLines);
       dots.forEach((dot, index) => dot.classList.toggle("is--active", index === next));
-      // Each switch: the same bounce and ripples as when the ring fills up.
-      bounceWithRipples();
+      // Each switch: the same bounce as when the ring fills up, without the
+      // ripples (they mark only the start and the end).
+      bounce();
       current = next;
     };
     const batchAt = (scrolled) => {
@@ -954,8 +964,9 @@ function initLogoPulse() {
         })
         .to(card, { scaleX: 1, scaleY: 1, duration: 1, ease: "elastic.out(1, 0.3)" });
       // And rings spread out from it, fading, as from the Work ring when it
-      // fills: the same three, start and timing, smaller (the plates sit
-      // close together). Made on the first hover.
+      // fills: the same three and timing, smaller (the plates sit close
+      // together), in the brand colour and so starting stronger (a coloured
+      // hairline reads fainter than a white one). Made on the first hover.
       if (!card._ripples) {
         card._ripples = [0, 1, 2].map(() => {
           const ripple = document.createElement("span");
@@ -967,7 +978,7 @@ function initLogoPulse() {
       }
       // Each ring shows only once it starts to spread (immediateRender off),
       // so the ones still waiting don't sit on the plate as an outline.
-      gsap.fromTo(card._ripples, { scale: 1, opacity: 0.25 }, {
+      gsap.fromTo(card._ripples, { scale: 1, opacity: 0.6 }, {
         scale: (index) => 1.4 + index * 0.3,
         opacity: 0,
         duration: 2,

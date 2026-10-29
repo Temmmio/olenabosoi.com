@@ -367,13 +367,11 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   );
 }
 
-/* Light theme: both names fully opaque in the text colour (white on the
-   dark hero, near-black in the footer); the shimmer and hover still turn
-   the letters towards the accent as they swell. */
-[data-theme="light"] .hero__name,
-[data-theme="light"] .footer__name { color: var(--fg); }
-[data-theme="light"] .hero__name .char,
-[data-theme="light"] .footer__name .char {
+/* Light theme: the hero name fully opaque in white on the dark hero; the
+   shimmer and hover still turn the letters towards the accent as they swell.
+   The footer name stays faint, as in the dark theme. */
+[data-theme="light"] .hero__name { color: var(--fg); }
+[data-theme="light"] .hero__name .char {
   color: color-mix(in srgb, var(--accent) calc(var(--wght-t) * 100%), var(--fg));
 }
 
@@ -1014,6 +1012,11 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   overflow: clip;
 }
 
+/* Room below the plates for the hover rings, which the section's clip would
+   cut: they spread to twice the plate, half a plate past its edge (plate
+   width as in osmo.css). */
+.wavy-marquee__collection { padding-bottom: clamp(3.75em, 5vw, 10em); }
+
 /* Square logo plates in the site palette (Osmo's are round and light grey). */
 .logo-card {
   background-color: var(--surface-2);
@@ -1044,23 +1047,36 @@ h6, .h6 { font-size: var(--fs-h6); line-height: 1.3; letter-spacing: -0.02em; }
   transition: background-color var(--duration-base) ease;
 }
 
+/* Each plate's brand colour on hover: the hue of the client's main colour
+   (--brand-h, set on the plate in index.html, taken from their site) at a
+   fixed saturation and lightness. Dark theme: a deep shade under the white
+   logo; light theme: a pale one under the black logo. The rings take a
+   brighter shade of the same hue, so a 1px line still shows. */
+.logo-card {
+  --brand-accent: hsl(var(--brand-h, 0) 78% 24%);
+  --brand-ripple: hsl(var(--brand-h, 0) 85% 55%);
+}
+[data-theme="light"] .logo-card {
+  --brand-accent: hsl(var(--brand-h, 0) 100% 85%);
+  --brand-ripple: hsl(var(--brand-h, 0) 95% 60%);
+}
+
 /* Rings that spread from a plate on hover (js/main.js initLogoPulse), as
-   the Work ring's ripples: a hairline in the text colour (half of it on
-   the light theme, where a dark line on white reads much stronger). */
+   the Work ring's ripples: a hairline in the brand colour. */
 .logo-card__ripple {
   position: absolute;
   inset: 0;
-  border: 1px solid var(--text-1);
+  border: 1px solid var(--brand-ripple);
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
 }
-[data-theme="light"] .logo-card__ripple { border-color: color-mix(in srgb, var(--text-1) 50%, transparent); }
 
-/* Hover: the plate and its logo light up (and bounce, js/main.js initLogoPulse). */
+/* Hover: the plate takes its brand colour and the logo lights up (and
+   bounces, js/main.js initLogoPulse). */
 .logo-card { transition: background-color var(--duration-base) ease; }
 @media (hover: hover) {
-  .logo-card:hover { background-color: var(--surface-3); }
+  .logo-card:hover { background-color: var(--brand-accent); }
   .logo-card:hover .logo-card__placeholder { color: var(--text-1); }
   .logo-card:hover .logo-card__logo { background-color: var(--text-1); }
 }
